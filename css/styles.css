@@ -3,8 +3,6 @@
    Archivo: styles.css — Diseño futurista
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,700;1,14..32,400&display=swap');
-
 /* ---- Variables globales ---- */
 :root {
   --bg-primario: #060B14;
