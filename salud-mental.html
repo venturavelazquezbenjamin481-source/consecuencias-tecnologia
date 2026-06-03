@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Salud mental · TecnoImpacto</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -16,35 +16,207 @@
         <li><a href="salud-fisica.html">Salud física</a></li>
         <li><a href="salud-mental.html">Salud mental</a></li>
         <li><a href="sociedad.html">Sociedad</a></li>
-        <li><a href="ambiente.html">Medio ambiente</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
       </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
-  <header class="hero">
-    <span class="hero-etiqueta">Salud mental</span>
-    <h1>El impacto en nuestra mente</h1>
+  <header class="pagina-hero">
+    <span class="pagina-icono-grande">🧠</span>
+    <div class="hero-etiqueta" style="--color-cian:var(--color-purpura); border-color:rgba(168,85,247,0.3); background:rgba(168,85,247,0.1)">
+      <span class="dot" style="background:var(--color-purpura); box-shadow: 0 0 10px var(--color-purpura)"></span>
+      Salud mental
+    </div>
+    <h1>El impacto de la<br><span style="color:var(--color-purpura); text-shadow: 0 0 30px rgba(168,85,247,0.5)">tecnología en tu mente</span></h1>
     <p>
-      Aquí irá el contenido de tu equipo sobre las consecuencias
-      psicológicas del uso excesivo de tecnología.
+      Más allá del cuerpo, el uso excesivo de dispositivos digitales deja
+      huellas profundas en nuestra psicología: ansiedad, adicción,
+      depresión y una distorsionada percepción de la realidad.
     </p>
   </header>
 
   <main class="contenedor">
+
+    <!-- Estadísticas -->
     <section class="seccion">
-      <p class="seccion-descripcion">
-        Esta sección está lista para que tu equipo agregue el contenido.
-        Usa las clases <code>.tarjeta</code>, <code>.grid-tarjetas</code>,
-        <code>.estadisticas</code> y <code>.cita</code> que ya están en el CSS.
-      </p>
+      <p class="seccion-etiqueta reveal" style="color:var(--color-purpura)">Datos globales</p>
+      <p class="seccion-titulo reveal delay-1">La crisis silenciosa en números</p>
+      <div class="estadisticas">
+        <div class="estadistica-item reveal delay-1" style="--glow-color:var(--color-purpura)">
+          <span class="estadistica-numero" style="color:var(--color-purpura)" data-objetivo="58%">0%</span>
+          <p class="estadistica-descripcion">De adolescentes reporta ansiedad relacionada con el uso de redes sociales</p>
+        </div>
+        <div class="estadistica-item reveal delay-2" style="--glow-color:var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="32%">0%</span>
+          <p class="estadistica-descripcion">Aumento en tasas de depresión juvenil desde la masificación de smartphones</p>
+        </div>
+        <div class="estadistica-item reveal delay-3" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="5.4h">0h</span>
+          <p class="estadistica-descripcion">Tiempo diario en redes sociales de jóvenes entre 16 y 24 años en México</p>
+        </div>
+        <div class="estadistica-item reveal delay-4" style="--glow-color:var(--color-purpura)">
+          <span class="estadistica-numero" style="color:var(--color-purpura)" data-objetivo="1">0</span>
+          <p class="estadistica-descripcion">De cada 4 jóvenes siente que no puede dejar de revisar el teléfono</p>
+        </div>
+      </div>
     </section>
+
+    <!-- Consecuencias mentales -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-purpura)">Diagnóstico</p>
+      <p class="seccion-titulo reveal delay-1">Efectos psicológicos del uso excesivo</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-purpura reveal delay-1">
+          <span class="tarjeta-icono">📱</span>
+          <h3>Adicción digital <span class="badge badge-purpura">Trastorno reconocido</span></h3>
+          <p>El cerebro libera dopamina cada vez que revisamos las redes. Este ciclo de recompensa crea una adicción real, similar a otras dependencias, con síntomas de abstinencia cuando se interrumpe el uso.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-rojo reveal delay-2">
+          <span class="tarjeta-icono">😰</span>
+          <h3>Ansiedad y FOMO <span class="badge badge-rojo">Muy frecuente</span></h3>
+          <p>El miedo a perderse de algo (FOMO) impulsa la revisión compulsiva de notificaciones. La hiperconectividad genera un estado de alerta permanente que el sistema nervioso interpreta como amenaza.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-purpura reveal delay-3">
+          <span class="tarjeta-icono">😔</span>
+          <h3>Depresión por redes sociales <span class="badge badge-purpura">Documentado</span></h3>
+          <p>La comparación social con versiones idealizadas de otras personas reduce la autoestima. Los estudios muestran que más de 3h diarias en redes duplican el riesgo de síntomas depresivos en adolescentes.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-4">
+          <span class="tarjeta-icono">🎯</span>
+          <h3>Déficit de atención <span class="badge badge-ambar">En aumento</span></h3>
+          <p>El contenido de formato corto (TikTok, Reels, Shorts) está condicionando al cerebro a necesitar estimulación constante, reduciendo drásticamente la capacidad de concentración sostenida.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-rojo reveal delay-5">
+          <span class="tarjeta-icono">🌃</span>
+          <h3>Insomnio psicológico <span class="badge badge-rojo">Frecuente</span></h3>
+          <p>La estimulación cognitiva nocturna por contenido digital activa el sistema nervioso cuando debería relajarse. El resultado es mente acelerada, dificultad para dormir y sueño no reparador.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-purpura reveal delay-6">
+          <span class="tarjeta-icono">🤳</span>
+          <h3>Dismorfofobia digital <span class="badge badge-purpura">Emergente</span></h3>
+          <p>La exposición constante a imágenes editadas y filtros de belleza genera una percepción distorsionada del propio cuerpo, especialmente en jóvenes, derivando en trastornos de la imagen corporal.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Dato destacado -->
+    <section class="seccion">
+      <div class="dato-destacado reveal" style="--accent-color:var(--color-purpura)">
+        <div class="dato-numero-grande" style="color:var(--color-purpura); text-shadow: 0 0 30px var(--color-purpura)">66%</div>
+        <div class="dato-texto">
+          <h4>Nomofobia — Miedo a estar sin teléfono</h4>
+          <p>El 66% de la población global sufre nomofobia (no-mobile-phone phobia): ansiedad severa al no tener el celular disponible o sin batería. Este trastorno fue catalogado oficialmente por psicólogos en 2008 y ha crecido exponencialmente con cada generación de smartphones.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- El ciclo de la dopamina -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-purpura)">Neurociencia</p>
+      <p class="seccion-titulo reveal delay-1">El ciclo de la dopamina digital</p>
+      <p class="seccion-descripcion reveal delay-2">
+        Las redes sociales están diseñadas para explotar el sistema de recompensa del cerebro.
+        Así funciona el ciclo adictivo:
+      </p>
+      <div class="linea-tiempo reveal delay-3">
+        <div class="tiempo-item" style="--dot-color: var(--color-purpura)">
+          <h4 style="color:var(--color-purpura)">1. Estímulo</h4>
+          <p>Recibes una notificación. El cerebro anticipa recompensa y libera una pequeña dosis de dopamina antes incluso de abrir la app.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-purpura)">2. Acción compulsiva</h4>
+          <p>Revisas el teléfono. A veces hay algo interesante (like, comentario, mensaje), a veces no. Este patrón de recompensa variable es el más adictivo conocido en psicología conductual.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-purpura)">3. Tolerancia</h4>
+          <p>Con el tiempo, necesitas más estimulación para sentir el mismo placer. Las sesiones se alargan y la tolerancia a la abstinencia disminuye.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-purpura)">4. Abstinencia</h4>
+          <p>Sin el teléfono, aparecen irritabilidad, dificultad para concentrarse y ansiedad. El cerebro demanda su dosis de dopamina digital.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Niveles de riesgo -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-purpura)">Evaluación</p>
+      <p class="seccion-titulo reveal delay-1">Nivel de afectación psicológica</p>
+      <div class="barra-progreso-contenedor reveal delay-2">
+        <div class="barra-item">
+          <div class="barra-label"><span>Ansiedad y FOMO</span><span style="color:var(--color-purpura)">88%</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="88" style="--bar-color:var(--color-purpura);--bar-color2:var(--color-rojo)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Adicción digital</span><span style="color:var(--color-purpura)">75%</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="75" style="--bar-color:var(--color-purpura);--bar-color2:#C084FC"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Depresión por redes</span><span style="color:var(--color-purpura)">65%</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="65" style="--bar-color:var(--color-rojo);--bar-color2:var(--color-purpura)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Déficit de atención</span><span style="color:var(--color-purpura)">70%</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="70" style="--bar-color:var(--color-ambar);--bar-color2:var(--color-purpura)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Imagen corporal negativa</span><span style="color:var(--color-purpura)">55%</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="55" style="--bar-color:var(--color-purpura);--bar-color2:var(--color-cian)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cita -->
+    <section class="seccion">
+      <blockquote class="cita reveal" style="border-color:var(--color-purpura); box-shadow: -3px 0 25px rgba(168,85,247,0.2); background: rgba(168,85,247,0.06)">
+        "Las redes sociales no son neutrales. Están diseñadas para maximizar el
+        tiempo de pantalla, no tu bienestar. Comprenderlo es el primer paso
+        para recuperar el control." — Estudio de la Universidad de Oxford, 2022
+      </blockquote>
+    </section>
+
+    <div class="nav-paginas reveal">
+      <a href="salud-fisica.html">← Salud física</a>
+      <a href="sociedad.html">Sociedad →</a>
+    </div>
+
   </main>
 
   <footer class="footer">
-    <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>

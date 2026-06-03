@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>Medio ambiente · TecnoImpacto</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
   <nav class="nav-principal">
     <div class="nav-interior">
       <a href="index.html" class="nav-logo">TecnoImpacto</a>
@@ -14,24 +16,205 @@
         <li><a href="salud-fisica.html">Salud física</a></li>
         <li><a href="salud-mental.html">Salud mental</a></li>
         <li><a href="sociedad.html">Sociedad</a></li>
-        <li><a href="ambiente.html">Medio ambiente</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
       </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
-  <header class="hero">
-    <span class="hero-etiqueta">En construcción</span>
-    <h1>Sección pendiente</h1>
-    <p>Esta página está lista para que tu equipo agregue el contenido. Usa las clases del CSS compartido.</p>
+
+  <header class="pagina-hero">
+    <span class="pagina-icono-grande">🌍</span>
+    <div class="hero-etiqueta" style="--color-cian:var(--color-verde); border-color:rgba(0,255,136,0.3); background:rgba(0,255,136,0.08)">
+      <span class="dot" style="background:var(--color-verde); box-shadow: 0 0 10px var(--color-verde)"></span>
+      Impacto ambiental
+    </div>
+    <h1>El precio ecológico de<br><span style="color:var(--color-verde); text-shadow: 0 0 30px rgba(0,255,136,0.4)">nuestra tecnología</span></h1>
+    <p>
+      Cada dispositivo que usamos, cada mensaje que enviamos, cada video que vemos
+      tiene un costo ambiental real. La industria tecnológica es una de las
+      mayores contaminadoras del planeta.
+    </p>
   </header>
+
   <main class="contenedor">
+
+    <!-- Estadísticas ambientales -->
     <section class="seccion">
-      <p class="seccion-descripcion">Agrega aquí tus tarjetas, estadísticas y citas usando las clases de styles.css.</p>
+      <p class="seccion-etiqueta reveal" style="color:var(--color-verde)">Datos ambientales</p>
+      <p class="seccion-titulo reveal delay-1">El costo ambiental en números</p>
+      <div class="estadisticas">
+        <div class="estadistica-item reveal delay-1" style="--glow-color:var(--color-verde)">
+          <span class="estadistica-numero" style="color:var(--color-verde)" data-objetivo="62M">0M</span>
+          <p class="estadistica-descripcion">Toneladas de residuos electrónicos generadas anualmente en el mundo</p>
+        </div>
+        <div class="estadistica-item reveal delay-2" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="4%">0%</span>
+          <p class="estadistica-descripcion">Del total de emisiones globales de CO₂ provienen del sector TIC</p>
+        </div>
+        <div class="estadistica-item reveal delay-3" style="--glow-color:var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="20%">0%</span>
+          <p class="estadistica-descripcion">De residuos electrónicos se recicla correctamente a nivel mundial</p>
+        </div>
+        <div class="estadistica-item reveal delay-4" style="--glow-color:var(--color-verde)">
+          <span class="estadistica-numero" style="color:var(--color-verde)" data-objetivo="200L">0L</span>
+          <p class="estadistica-descripcion">De agua necesarios para fabricar un solo smartphone</p>
+        </div>
+      </div>
     </section>
+
+    <!-- Principales problemas -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-verde)">Problemas críticos</p>
+      <p class="seccion-titulo reveal delay-1">El impacto ambiental de la tecnología</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-rojo reveal delay-1">
+          <span class="tarjeta-icono">♻️</span>
+          <h3>Basura electrónica (e-waste) <span class="badge badge-rojo">Crisis global</span></h3>
+          <p>Con 62 millones de toneladas anuales, los residuos electrónicos son la corriente de residuos de mayor crecimiento en el mundo. Contienen metales pesados como plomo, mercurio y cadmio que contaminan suelos y agua.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-2">
+          <span class="tarjeta-icono">⚡</span>
+          <h3>Consumo energético masivo <span class="badge badge-ambar">En aumento</span></h3>
+          <p>Los centros de datos mundiales consumen más electricidad que algunos países enteros. Se estima que para 2030, el sector TIC consumirá el 21% de la electricidad global. Cada búsqueda en Google tiene un costo energético.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-rojo reveal delay-3">
+          <span class="tarjeta-icono">📦</span>
+          <h3>Obsolescencia programada <span class="badge badge-rojo">Sistémico</span></h3>
+          <p>Los fabricantes diseñan dispositivos con vida útil artificial de 2-3 años para garantizar ventas constantes. Esto genera millones de dispositivos desechados prematuramente con materiales aún funcionando.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-verde reveal delay-4">
+          <span class="tarjeta-icono">⛏️</span>
+          <h3>Minería destructiva <span class="badge badge-verde">Ignorado</span></h3>
+          <p>Los smartphones requieren más de 60 elementos de la tabla periódica. La extracción de coltán, litio y cobalto destruye ecosistemas, contamina ríos y ocurre frecuentemente en zonas de conflicto armado.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-5">
+          <span class="tarjeta-icono">💧</span>
+          <h3>Huella hídrica digital <span class="badge badge-ambar">Oculta</span></h3>
+          <p>Fabricar un smartphone requiere aproximadamente 200 litros de agua. Los centros de datos utilizan millones de litros diarios para refrigeración. La industria TIC es una de las mayores consumidoras de agua dulce.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-rojo reveal delay-6">
+          <span class="tarjeta-icono">🌡️</span>
+          <h3>Huella de carbono digital <span class="badge badge-rojo">Creciente</span></h3>
+          <p>Enviar 65 correos equivale a las emisiones de conducir 1 km. Ver video en streaming genera 300g de CO₂ por hora. La IA generativa como ChatGPT consume 10 veces más energía que una búsqueda convencional.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Dato destacado -->
+    <section class="seccion">
+      <div class="dato-destacado reveal" style="--accent-color: var(--color-verde)">
+        <div class="dato-numero-grande" style="color:var(--color-verde)">62M</div>
+        <div class="dato-texto">
+          <h4>Toneladas de e-waste al año</h4>
+          <p>Solo el 17-20% de los residuos electrónicos globales se recicla adecuadamente. El resto termina en vertederos informales en países en desarrollo, donde trabajadores sin protección exponen sus familias a metales tóxicos. México genera más de 1 millón de toneladas anuales.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparación de huella de carbono -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-verde)">Comparación</p>
+      <p class="seccion-titulo reveal delay-1">Huella de CO₂ de actividades digitales</p>
+      <div class="barra-progreso-contenedor reveal delay-2">
+        <div class="barra-item">
+          <div class="barra-label"><span>Fabricar un smartphone</span><span style="color:var(--color-verde)">70 kg CO₂</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="90" style="--bar-color:var(--color-rojo);--bar-color2:var(--color-ambar)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Usar IA generativa 1 hora</span><span style="color:var(--color-verde)">500g CO₂</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="70" style="--bar-color:var(--color-ambar);--bar-color2:var(--color-rojo)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Streaming 4K — 1 hora</span><span style="color:var(--color-verde)">300g CO₂</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="50" style="--bar-color:var(--color-verde);--bar-color2:var(--color-ambar)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Enviar 1 correo con adjunto</span><span style="color:var(--color-verde)">50g CO₂</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="30" style="--bar-color:var(--color-cian);--bar-color2:var(--color-verde)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label"><span>Búsqueda en Google</span><span style="color:var(--color-verde)">0.2g CO₂</span></div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="10" style="--bar-color:var(--color-verde);--bar-color2:var(--color-cian)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabla de impacto -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-verde)">Resumen</p>
+      <p class="seccion-titulo reveal delay-1">Ciclo de vida de un smartphone</p>
+      <div class="tabla-contenedor reveal delay-2">
+        <table>
+          <thead>
+            <tr>
+              <th>Etapa</th>
+              <th>Impacto ambiental</th>
+              <th>Nivel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Extracción de minerales</td><td>Destrucción de ecosistemas, agua contaminada</td><td><span class="badge badge-rojo">Crítico</span></td></tr>
+            <tr><td>Fabricación</td><td>200L de agua, 70 kg de CO₂ por dispositivo</td><td><span class="badge badge-rojo">Alto</span></td></tr>
+            <tr><td>Transporte global</td><td>Emisiones por cadena de suministro internacional</td><td><span class="badge badge-ambar">Moderado</span></td></tr>
+            <tr><td>Uso diario</td><td>Consumo eléctrico constante de cargadores</td><td><span class="badge badge-ambar">Moderado</span></td></tr>
+            <tr><td>Descarte prematuro</td><td>Plomo, mercurio en vertederos</td><td><span class="badge badge-rojo">Crítico</span></td></tr>
+            <tr><td>Reciclaje (raro)</td><td>Recuperación parcial de materiales</td><td><span class="badge badge-verde">Bajo si se hace</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Cita -->
+    <section class="seccion">
+      <blockquote class="cita reveal" style="border-color:var(--color-verde); box-shadow: -3px 0 25px rgba(0,255,136,0.15); background: rgba(0,255,136,0.05)">
+        "El mundo digital no es limpio. Tiene una huella física enorme,
+        a menudo invisibilizada. Cada dispositivo tiene una historia de
+        extracción, manufactura y contaminación que comienza mucho antes
+        de llegar a nuestras manos." — Informe de la ONU sobre e-waste, 2024
+      </blockquote>
+    </section>
+
+    <div class="nav-paginas reveal">
+      <a href="sociedad.html">← Sociedad</a>
+      <a href="soluciones.html">Soluciones →</a>
+    </div>
+
   </main>
+
   <footer class="footer">
-    <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
   </footer>
-  <script src="js/main.js"></script>
+
+  <script src="main.js"></script>
 </body>
 </html>

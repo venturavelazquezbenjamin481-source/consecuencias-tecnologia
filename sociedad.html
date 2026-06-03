@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>Sociedad · TecnoImpacto</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
   <nav class="nav-principal">
     <div class="nav-interior">
       <a href="index.html" class="nav-logo">TecnoImpacto</a>
@@ -14,24 +16,166 @@
         <li><a href="salud-fisica.html">Salud física</a></li>
         <li><a href="salud-mental.html">Salud mental</a></li>
         <li><a href="sociedad.html">Sociedad</a></li>
-        <li><a href="ambiente.html">Medio ambiente</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
       </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
-  <header class="hero">
-    <span class="hero-etiqueta">En construcción</span>
-    <h1>Sección pendiente</h1>
-    <p>Esta página está lista para que tu equipo agregue el contenido. Usa las clases del CSS compartido.</p>
+
+  <header class="pagina-hero">
+    <span class="pagina-icono-grande">👥</span>
+    <div class="hero-etiqueta" style="--color-cian:var(--color-cian); border-color:var(--borde); background:var(--color-cian-suave)">
+      <span class="dot"></span>
+      Impacto social
+    </div>
+    <h1>La tecnología y<br><span style="color:var(--color-cian); text-shadow: 0 0 30px rgba(0,212,255,0.4)">nuestras relaciones</span></h1>
+    <p>
+      Paradójicamente, la tecnología que nos promete conectar al mundo
+      está generando mayor aislamiento, polarización y fragmentación
+      del tejido social a niveles nunca antes vistos.
+    </p>
   </header>
+
   <main class="contenedor">
+
+    <!-- Estadísticas -->
     <section class="seccion">
-      <p class="seccion-descripcion">Agrega aquí tus tarjetas, estadísticas y citas usando las clases de styles.css.</p>
+      <p class="seccion-etiqueta reveal">Datos sociales</p>
+      <p class="seccion-titulo reveal delay-1">La desconexión en números</p>
+      <div class="estadisticas">
+        <div class="estadistica-item reveal delay-1" style="--glow-color:var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="37%">0%</span>
+          <p class="estadistica-descripcion">De jóvenes reporta sentirse más solo a pesar de estar hiperconectado</p>
+        </div>
+        <div class="estadistica-item reveal delay-2" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="1">0</span>
+          <p class="estadistica-descripcion">De cada 3 adolescentes ha sido víctima de cyberbullying</p>
+        </div>
+        <div class="estadistica-item reveal delay-3" style="--glow-color:var(--color-cian)">
+          <span class="estadistica-numero" style="color:var(--color-cian)" data-objetivo="4.9B">0B</span>
+          <p class="estadistica-descripcion">Usuarios activos en redes sociales que conviven en cámaras de eco</p>
+        </div>
+        <div class="estadistica-item reveal delay-4" style="--glow-color:var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="60%">0%</span>
+          <p class="estadistica-descripcion">De noticias falsas se propagan más rápido que las verdaderas en redes</p>
+        </div>
+      </div>
     </section>
+
+    <!-- Consecuencias sociales -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal">Diagnóstico social</p>
+      <p class="seccion-titulo reveal delay-1">Consecuencias en la sociedad</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-azul reveal delay-1">
+          <span class="tarjeta-icono">🏝️</span>
+          <h3>Aislamiento social <span class="badge badge-azul">Paradójico</span></h3>
+          <p>Pasar horas en redes sociales puede sustituir las interacciones cara a cara sin reemplazar la conexión emocional real. El resultado es una sensación de soledad intensa incluso rodeado de "amigos" digitales.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-rojo reveal delay-2">
+          <span class="tarjeta-icono">🎯</span>
+          <h3>Cyberbullying <span class="badge badge-rojo">Grave</span></h3>
+          <p>El anonimato digital facilita el acoso. El cyberbullying afecta al 37% de los adolescentes y tiene consecuencias más duraderas que el bullying presencial, ya que no existe refugio físico posible.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-3">
+          <span class="tarjeta-icono">🗣️</span>
+          <h3>Polarización y cámaras de eco <span class="badge badge-ambar">Sistémico</span></h3>
+          <p>Los algoritmos de recomendación priorizan contenido que genera reacción emocional intensa, creando burbujas ideológicas que radicalizan opiniones y dificultan el diálogo entre grupos distintos.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-rojo reveal delay-4">
+          <span class="tarjeta-icono">📰</span>
+          <h3>Desinformación masiva <span class="badge badge-rojo">Epidemia digital</span></h3>
+          <p>Las noticias falsas se propagan un 70% más rápido que las verdaderas en redes sociales. La falta de verificación y el sesgo de confirmación hacen a los usuarios vulnerables a la manipulación informativa.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-azul reveal delay-5">
+          <span class="tarjeta-icono">💬</span>
+          <h3>Pérdida de habilidades comunicativas <span class="badge badge-azul">En estudio</span></h3>
+          <p>La comunicación mediada por pantallas reduce la práctica de habilidades como la escucha activa, la lectura del lenguaje corporal y la empatía presencial, habilidades clave para la convivencia.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-6">
+          <span class="tarjeta-icono">⚖️</span>
+          <h3>Brecha digital <span class="badge badge-ambar">Desigualdad</span></h3>
+          <p>El acceso desigual a internet reproduce y amplifica desigualdades socioeconómicas existentes. Quienes no tienen acceso quedan excluidos de oportunidades educativas, laborales y sociales crecientes.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Cyberbullying en detalle -->
+    <section class="seccion">
+      <div class="dato-destacado reveal" style="--accent-color: var(--color-rojo)">
+        <div class="dato-numero-grande" style="color:var(--color-rojo)">37%</div>
+        <div class="dato-texto">
+          <h4>Los jóvenes y el cyberbullying</h4>
+          <p>Según UNICEF, 1 de cada 3 adolescentes en el mundo ha experimentado cyberbullying. A diferencia del acoso presencial, el digital es constante, puede ser anónimo y tiene un alcance potencialmente viral. Las víctimas reportan mayores niveles de depresión, ansiedad y pensamientos suicidas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabla comparativa -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal">Comparación</p>
+      <p class="seccion-titulo reveal delay-1">Interacción real vs. digital</p>
+      <div class="tabla-contenedor reveal delay-2">
+        <table>
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>Interacción presencial</th>
+              <th>Interacción digital</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Empatía</td><td>Alta — se percibe el lenguaje no verbal</td><td>Reducida — solo texto/imagen</td></tr>
+            <tr><td>Conflictos</td><td>Se resuelven cara a cara</td><td>Escalan por malinterpretación</td></tr>
+            <tr><td>Continuidad</td><td>Limitada por tiempo y espacio</td><td>Constante, sin descanso</td></tr>
+            <tr><td>Autenticidad</td><td>Mayor naturalidad</td><td>Filtrada y editada</td></tr>
+            <tr><td>Escucha activa</td><td>Se practica y desarrolla</td><td>Se atrofia</td></tr>
+            <tr><td>Vínculos</td><td>Profundos, duraderos</td><td>Numerosos pero superficiales</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Cita -->
+    <section class="seccion">
+      <blockquote class="cita reveal">
+        "Tenemos más formas de comunicarnos que nunca y, sin embargo,
+        la epidemia de soledad es una de las mayores crisis de salud pública
+        del siglo XXI." — Dr. Vivek Murthy, ex Cirujano General de EE.UU., 2023
+      </blockquote>
+    </section>
+
+    <div class="nav-paginas reveal">
+      <a href="salud-mental.html">← Salud mental</a>
+      <a href="ambiente.html">Medio ambiente →</a>
+    </div>
+
   </main>
+
   <footer class="footer">
-    <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
   </footer>
-  <script src="js/main.js"></script>
+
+  <script src="main.js"></script>
 </body>
 </html>

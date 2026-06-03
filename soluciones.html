@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>Soluciones · TecnoImpacto</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
   <nav class="nav-principal">
     <div class="nav-interior">
       <a href="index.html" class="nav-logo">TecnoImpacto</a>
@@ -14,24 +16,265 @@
         <li><a href="salud-fisica.html">Salud física</a></li>
         <li><a href="salud-mental.html">Salud mental</a></li>
         <li><a href="sociedad.html">Sociedad</a></li>
-        <li><a href="ambiente.html">Medio ambiente</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
       </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
-  <header class="hero">
-    <span class="hero-etiqueta">En construcción</span>
-    <h1>Sección pendiente</h1>
-    <p>Esta página está lista para que tu equipo agregue el contenido. Usa las clases del CSS compartido.</p>
+
+  <header class="pagina-hero">
+    <span class="pagina-icono-grande">✦</span>
+    <div class="hero-etiqueta" style="--color-cian:var(--color-ambar); border-color:rgba(255,184,0,0.3); background:rgba(255,184,0,0.08)">
+      <span class="dot" style="background:var(--color-ambar); box-shadow: 0 0 10px var(--color-ambar)"></span>
+      Acciones concretas
+    </div>
+    <h1>Usar la tecnología<br><span style="color:var(--color-ambar); text-shadow: 0 0 30px rgba(255,184,0,0.4)">de forma consciente</span></h1>
+    <p>
+      Conocer el problema es el primer paso. El siguiente es actuar.
+      Estas soluciones están respaldadas por evidencia científica y son
+      aplicables desde hoy, sin dejar de usar la tecnología.
+    </p>
   </header>
+
   <main class="contenedor">
+
+    <!-- Estadísticas positivas -->
     <section class="seccion">
-      <p class="seccion-descripcion">Agrega aquí tus tarjetas, estadísticas y citas usando las clases de styles.css.</p>
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Evidencia</p>
+      <p class="seccion-titulo reveal delay-1">Los cambios sí funcionan</p>
+      <div class="estadisticas">
+        <div class="estadistica-item reveal delay-1" style="--glow-color:var(--color-verde)">
+          <span class="estadistica-numero" style="color:var(--color-verde)" data-objetivo="40%">0%</span>
+          <p class="estadistica-descripcion">Reducción en ansiedad al limitar redes sociales a 30 min/día</p>
+        </div>
+        <div class="estadistica-item reveal delay-2" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="60%">0%</span>
+          <p class="estadistica-descripcion">Mejora en calidad del sueño al eliminar pantallas 1h antes de dormir</p>
+        </div>
+        <div class="estadistica-item reveal delay-3" style="--glow-color:var(--color-verde)">
+          <span class="estadistica-numero" style="color:var(--color-verde)" data-objetivo="25%">0%</span>
+          <p class="estadistica-descripcion">Aumento en productividad al desactivar notificaciones durante el estudio</p>
+        </div>
+        <div class="estadistica-item reveal delay-4" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="3x">0x</span>
+          <p class="estadistica-descripcion">Más satisfacción vital reportada en personas que hacen "detox" digital regular</p>
+        </div>
+      </div>
     </section>
+
+    <!-- Soluciones para salud física -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Salud física</p>
+      <p class="seccion-titulo reveal delay-1">Cuida tu cuerpo</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-verde reveal delay-1">
+          <span class="tarjeta-icono">👀</span>
+          <h3>Regla 20-20-20 <span class="badge badge-verde">Comprobada</span></h3>
+          <p>Cada 20 minutos de pantalla, mira durante 20 segundos a algo a 6 metros de distancia. Reduce la fatiga ocular hasta un 60%. Configura una alarma para recordarlo.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-verde reveal delay-2">
+          <span class="tarjeta-icono">🧘</span>
+          <h3>Postura ergonómica</h3>
+          <p>Pantalla a la altura de los ojos, espalda recta, pies apoyados en el suelo. Toma pausas activas de 5 minutos por cada hora. Apps como "Stretchly" te lo recuerdan automáticamente.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-verde reveal delay-3">
+          <span class="tarjeta-icono">🌙</span>
+          <h3>Higiene del sueño digital</h3>
+          <p>Sin pantallas 1 hora antes de dormir. Activa el filtro de luz azul en todos tus dispositivos (Night Mode). Carga el celular fuera de la habitación para evitar la tentación.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-verde reveal delay-4">
+          <span class="tarjeta-icono">🏃</span>
+          <h3>Movimiento integrado</h3>
+          <p>Por cada hora de pantalla, muévete 5-10 minutos. Caminatas cortas, estiramientos o ejercicio ligero compensan el sedentarismo y mejoran la concentración.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Soluciones para salud mental -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Salud mental</p>
+      <p class="seccion-titulo reveal delay-1">Cuida tu mente</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-ambar reveal delay-1">
+          <span class="tarjeta-icono">📵</span>
+          <h3>Tiempo de pantalla controlado <span class="badge badge-ambar">Efectivo</span></h3>
+          <p>Usa las herramientas integradas en tu teléfono (Screen Time en iOS, Digital Wellbeing en Android) para establecer límites por app. Comienza con reducir el 20% de tu tiempo actual.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-2">
+          <span class="tarjeta-icono">🔕</span>
+          <h3>Desintoxicación de notificaciones</h3>
+          <p>Desactiva todas las notificaciones que no sean urgentes. Revisa las redes a horarios fijos en lugar de reactivamente. Esto reduce la ansiedad en un 38% según estudios de la Universidad de British Columbia.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-3">
+          <span class="tarjeta-icono">🧹</span>
+          <h3>Curación del feed</h3>
+          <p>Deja de seguir cuentas que te generan envidia, inseguridad o tristeza. Sigue cuentas que aporten aprendizaje, inspiración genuina o alegría. Tu feed es tu entorno mental.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-ambar reveal delay-4">
+          <span class="tarjeta-icono">🎯</span>
+          <h3>Uso intencional</h3>
+          <p>Antes de abrir una app, pregúntate: "¿Para qué voy a usar esto?" Tener un propósito claro evita el scroll infinito sin sentido que consume tiempo y energía mental.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Soluciones sociales -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Sociedad</p>
+      <p class="seccion-titulo reveal delay-1">Reconecta de verdad</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-azul reveal delay-1">
+          <span class="tarjeta-icono">📵</span>
+          <h3>Zonas libres de teléfono <span class="badge badge-azul">Recomendado</span></h3>
+          <p>Establece la mesa del comedor, el dormitorio y las reuniones familiares como zonas libres de dispositivos. Las conversaciones presenciales sin distracciones profundizan los vínculos afectivos.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-azul reveal delay-2">
+          <span class="tarjeta-icono">✅</span>
+          <h3>Verificación de información</h3>
+          <p>Antes de compartir cualquier noticia, verifica en al menos dos fuentes confiables. Plataformas como Verificado México o Snopes ayudan a combatir la desinformación. No seas un eslabón de la cadena de bulos.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-azul reveal delay-3">
+          <span class="tarjeta-icono">🌱</span>
+          <h3>Educación digital</h3>
+          <p>Aprende sobre privacidad, pensamiento crítico digital y manejo de algoritmos. Conocer cómo funcionan las plataformas te hace más resiliente ante la manipulación.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Soluciones ambientales -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Medio ambiente</p>
+      <p class="seccion-titulo reveal delay-1">Reduce tu huella digital</p>
+      <div class="grid-tarjetas">
+
+        <div class="tarjeta tarjeta-verde reveal delay-1">
+          <span class="tarjeta-icono">📱</span>
+          <h3>Extiende la vida de tus dispositivos <span class="badge badge-verde">Alto impacto</span></h3>
+          <p>No cambies de celular antes de los 3-4 años. Usa fundas para protegerlo, reemplaza la batería en lugar de tirar el dispositivo. Cada año extra de vida reduce tu huella de carbono personal en ~15 kg CO₂.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-verde reveal delay-2">
+          <span class="tarjeta-icono">♻️</span>
+          <h3>Reciclaje electrónico responsable</h3>
+          <p>Nunca tires dispositivos en la basura común. Lleva a puntos de reciclaje electrónico certificados (muchas tiendas de tecnología los tienen). Vende o dona dispositivos funcionales que ya no uses.</p>
+        </div>
+
+        <div class="tarjeta tarjeta-verde reveal delay-3">
+          <span class="tarjeta-icono">☁️</span>
+          <h3>Reduce el consumo en la nube</h3>
+          <p>Elimina correos innecesarios, borra archivos duplicados, y elige resolución de streaming acorde a tu pantalla. Estas acciones pequeñas reducen la demanda energética de centros de datos.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Plan de acción semanal -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Plan de acción</p>
+      <p class="seccion-titulo reveal delay-1">Empieza esta semana</p>
+      <p class="seccion-descripcion reveal delay-2">
+        Un cambio pequeño sostenido en el tiempo tiene más impacto que uno grande que no se mantiene.
+        Aquí un plan de 7 días para comenzar:
+      </p>
+      <div class="linea-tiempo reveal delay-3">
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-ambar)">Día 1–2 · Auditoría digital</h4>
+          <p>Revisa tu tiempo de pantalla real en los ajustes del teléfono. Identifica las apps que más consumes. Sin juzgar, solo observar.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-ambar)">Día 3 · Limpieza de notificaciones</h4>
+          <p>Desactiva todas las notificaciones excepto llamadas y mensajes urgentes. Siente la diferencia durante 24 horas.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-ambar)">Día 4 · Primera noche sin celular</h4>
+          <p>Carga el teléfono fuera de tu cuarto por primera vez. Lleva un libro o cuaderno a la cama en su lugar.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-ambar)">Día 5–6 · Actividad sin pantalla</h4>
+          <p>Dedica 1 hora diaria a algo sin dispositivos: ejercicio, lectura física, conversación presencial, arte, naturaleza.</p>
+        </div>
+        <div class="tiempo-item">
+          <h4 style="color:var(--color-ambar)">Día 7 · Establece límites permanentes</h4>
+          <p>Con base en lo aprendido, configura límites de tiempo por app en tu teléfono. Comprométete con una zona libre de pantallas en casa.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cita final -->
+    <section class="seccion">
+      <blockquote class="cita reveal" style="border-color:var(--color-ambar); box-shadow: -3px 0 25px rgba(255,184,0,0.15); background: rgba(255,184,0,0.05)">
+        "No se trata de rechazar la tecnología, sino de dominarla.
+        El objetivo no es usar menos, sino usar mejor.
+        La tecnología debe servir a tu vida, no sustituirla."
+      </blockquote>
+    </section>
+
+    <!-- Resumen de todas las secciones -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal" style="color:var(--color-ambar)">Explora más</p>
+      <p class="seccion-titulo reveal delay-1">Vuelve a las secciones</p>
+      <div class="grid-tarjetas">
+        <a href="salud-fisica.html" class="tarjeta tarjeta-rojo reveal delay-1" style="text-decoration:none;color:inherit">
+          <span class="tarjeta-icono">🫀</span>
+          <h3>Salud física</h3>
+          <p>Sedentarismo, postura, sueño y lesiones por uso de dispositivos.</p>
+        </a>
+        <a href="salud-mental.html" class="tarjeta tarjeta-purpura reveal delay-2" style="text-decoration:none;color:inherit">
+          <span class="tarjeta-icono">🧠</span>
+          <h3>Salud mental</h3>
+          <p>Adicción digital, ansiedad, depresión y FOMO.</p>
+        </a>
+        <a href="sociedad.html" class="tarjeta tarjeta-azul reveal delay-3" style="text-decoration:none;color:inherit">
+          <span class="tarjeta-icono">👥</span>
+          <h3>Sociedad</h3>
+          <p>Aislamiento, cyberbullying y polarización digital.</p>
+        </a>
+        <a href="ambiente.html" class="tarjeta tarjeta-verde reveal delay-4" style="text-decoration:none;color:inherit">
+          <span class="tarjeta-icono">🌍</span>
+          <h3>Medio ambiente</h3>
+          <p>E-waste, consumo energético y huella de carbono digital.</p>
+        </a>
+      </div>
+    </section>
+
+    <div class="nav-paginas reveal">
+      <a href="ambiente.html">← Medio ambiente</a>
+      <a href="index.html">Inicio →</a>
+    </div>
+
   </main>
+
   <footer class="footer">
-    <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
   </footer>
-  <script src="js/main.js"></script>
+
+  <script src="main.js"></script>
 </body>
 </html>

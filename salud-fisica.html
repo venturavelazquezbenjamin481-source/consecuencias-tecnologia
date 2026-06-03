@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Salud física · TecnoImpacto</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -16,121 +16,189 @@
         <li><a href="salud-fisica.html">Salud física</a></li>
         <li><a href="salud-mental.html">Salud mental</a></li>
         <li><a href="sociedad.html">Sociedad</a></li>
-        <li><a href="ambiente.html">Medio ambiente</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
       </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
-  <header class="hero">
-    <span class="hero-etiqueta">Consecuencias físicas</span>
-    <h1>Lo que la tecnología le hace a tu cuerpo</h1>
+  <header class="pagina-hero">
+    <span class="pagina-icono-grande">🫀</span>
+    <div class="hero-etiqueta">
+      <span class="dot"></span>
+      Consecuencias físicas
+    </div>
+    <h1>Lo que la tecnología<br><span style="color:var(--color-rojo); text-shadow: 0 0 30px rgba(255,77,109,0.5)">le hace a tu cuerpo</span></h1>
     <p>
       El uso prolongado de dispositivos tecnológicos tiene efectos directos
-      y medibles en nuestro cuerpo. Muchos se desarrollan de forma silenciosa
-      hasta convertirse en problemas crónicos.
+      y medibles en nuestro organismo. Muchos se desarrollan de forma silenciosa
+      hasta convertirse en problemas crónicos e irreversibles.
     </p>
   </header>
 
   <main class="contenedor">
 
-    <!-- Tarjetas de consecuencias -->
+    <!-- Estadísticas de salud física -->
     <section class="seccion">
-      <p class="seccion-etiqueta">Áreas afectadas</p>
-      <p class="seccion-titulo">Principales consecuencias físicas</p>
+      <p class="seccion-etiqueta reveal">Datos clave</p>
+      <p class="seccion-titulo reveal delay-1">El costo físico en números</p>
+      <div class="estadisticas">
+        <div class="estadistica-item reveal delay-1" style="--glow-color:var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="50%">0%</span>
+          <p class="estadistica-descripcion">De usuarios de pantallas sufre síndrome visual por computadora</p>
+        </div>
+        <div class="estadistica-item reveal delay-2" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="27kg">0kg</span>
+          <p class="estadistica-descripcion">De presión sobre el cuello al inclinar la cabeza 60° al celular</p>
+        </div>
+        <div class="estadistica-item reveal delay-3" style="--glow-color:var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="90min">0min</span>
+          <p class="estadistica-descripcion">De retraso en el sueño por la luz azul de pantallas nocturnas</p>
+        </div>
+        <div class="estadistica-item reveal delay-4" style="--glow-color:var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="3x">0x</span>
+          <p class="estadistica-descripcion">Mayor riesgo de obesidad en jóvenes sedentarios con >4h en pantalla</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consecuencias principales -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal">Áreas afectadas</p>
+      <p class="seccion-titulo reveal delay-1">Principales consecuencias físicas</p>
       <div class="grid-tarjetas">
 
-        <div class="tarjeta tarjeta-rojo">
-          <div class="tarjeta-icono">👁️</div>
-          <h3>Síndrome visual por computadora</h3>
-          <p>Pasar horas frente a pantallas obliga a los ojos a un esfuerzo constante: ojos secos, visión borrosa, dolor de cabeza y sensibilidad a la luz.</p>
+        <div class="tarjeta tarjeta-rojo reveal delay-1">
+          <span class="tarjeta-icono">👁️</span>
+          <h3>Síndrome visual por computadora <span class="badge badge-rojo">Muy frecuente</span></h3>
+          <p>Pasar horas frente a pantallas obliga a los ojos a un esfuerzo constante: ojos secos, visión borrosa, dolor de cabeza y sensibilidad a la luz. La frecuencia de parpadeo se reduce a la mitad.</p>
         </div>
 
-        <div class="tarjeta tarjeta-ambar">
-          <div class="tarjeta-icono">🦴</div>
-          <h3>Daño postural — "Tech neck"</h3>
-          <p>Al inclinar la cabeza 60° hacia el celular, el cuello soporta hasta 27 kg de presión. Esto genera dolor cervical, lumbar y tensión en hombros.</p>
+        <div class="tarjeta tarjeta-ambar reveal delay-2">
+          <span class="tarjeta-icono">🦴</span>
+          <h3>Daño postural — "Tech neck" <span class="badge badge-ambar">Crónico</span></h3>
+          <p>Al inclinar la cabeza 60° hacia el celular, el cuello soporta hasta 27 kg de presión. Esto genera dolor cervical, lumbar y tensión acumulada en hombros que con el tiempo se vuelve permanente.</p>
         </div>
 
-        <div class="tarjeta tarjeta-rojo">
-          <div class="tarjeta-icono">🛋️</div>
-          <h3>Sedentarismo y obesidad</h3>
-          <p>Las pantallas reemplazan la actividad física, reducen el gasto calórico y aumentan el riesgo de enfermedades cardiovasculares y diabetes tipo 2.</p>
+        <div class="tarjeta tarjeta-rojo reveal delay-3">
+          <span class="tarjeta-icono">🛋️</span>
+          <h3>Sedentarismo y obesidad <span class="badge badge-rojo">Alto riesgo</span></h3>
+          <p>Las pantallas reemplazan la actividad física, reducen el gasto calórico y aumentan el riesgo de enfermedades cardiovasculares, diabetes tipo 2 y problemas metabólicos.</p>
         </div>
 
-        <div class="tarjeta tarjeta-azul">
-          <div class="tarjeta-icono">😴</div>
-          <h3>Alteraciones del sueño</h3>
-          <p>La luz azul inhibe la melatonina, retrasando el inicio del sueño entre 60 y 90 minutos. Provoca insomnio, somnolencia diurna y bajo rendimiento.</p>
+        <div class="tarjeta tarjeta-azul reveal delay-4">
+          <span class="tarjeta-icono">😴</span>
+          <h3>Alteraciones del sueño <span class="badge badge-azul">Frecuente</span></h3>
+          <p>La luz azul inhibe la producción de melatonina, retrasando el inicio del sueño entre 60 y 90 minutos. Provoca insomnio crónico, somnolencia diurna y bajo rendimiento académico.</p>
         </div>
 
-        <div class="tarjeta tarjeta-ambar">
-          <div class="tarjeta-icono">🤲</div>
-          <h3>Lesiones por movimiento repetitivo</h3>
-          <p>Síndrome del túnel carpiano, "WhatsApp thumb" y codo de mouse son lesiones cada vez más comunes en jóvenes por el uso excesivo de dispositivos.</p>
+        <div class="tarjeta tarjeta-ambar reveal delay-5">
+          <span class="tarjeta-icono">🤲</span>
+          <h3>Lesiones por movimiento repetitivo <span class="badge badge-ambar">En aumento</span></h3>
+          <p>Síndrome del túnel carpiano, "WhatsApp thumb" y codo de mouse son lesiones cada vez más comunes en jóvenes. Se estima que 1 de cada 10 adolescentes ya presenta tendinitis relacionada con dispositivos.</p>
         </div>
 
-        <div class="tarjeta tarjeta-rojo">
-          <div class="tarjeta-icono">🤕</div>
-          <h3>Dolor de cabeza frecuente</h3>
-          <p>La tensión muscular acumulada en cuello y hombros, la luz intensa de las pantallas y la deshidratación son detonantes comunes de migrañas.</p>
+        <div class="tarjeta tarjeta-rojo reveal delay-6">
+          <span class="tarjeta-icono">🤕</span>
+          <h3>Migrañas frecuentes <span class="badge badge-rojo">Moderado</span></h3>
+          <p>La tensión muscular acumulada en cuello y hombros, la luz intensa, la deshidratación y el estrés visual son detonantes comunes de migrañas en usuarios intensivos de tecnología.</p>
         </div>
 
       </div>
     </section>
 
-    <!-- Cita -->
+    <!-- Dato destacado -->
     <section class="seccion">
-      <blockquote class="cita">
-        "La Asociación Americana de Optometría estima que más del 50% de los usuarios
-        de computadoras experimenta algún grado de síndrome visual por computadora."
-      </blockquote>
+      <div class="dato-destacado reveal" style="--accent-color: var(--color-rojo)">
+        <div class="dato-numero-grande">50%</div>
+        <div class="dato-texto">
+          <h4>Síndrome visual por computadora</h4>
+          <p>La Asociación Americana de Optometría estima que más del 50% de los usuarios de pantallas experimenta algún grado de síndrome visual por computadora, también conocido como CVS. Los síntomas incluyen visión borrosa, ojos secos y dolores de cabeza.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Niveles de riesgo -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal">Evaluación</p>
+      <p class="seccion-titulo reveal delay-1">Nivel de riesgo por área</p>
+      <div class="barra-progreso-contenedor reveal delay-2">
+        <div class="barra-item">
+          <div class="barra-label">
+            <span>Sedentarismo y obesidad</span>
+            <span>92%</span>
+          </div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="92"
+              style="--bar-color:var(--color-rojo);--bar-color2:#FF1744"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label">
+            <span>Daño postural (Tech neck)</span>
+            <span>85%</span>
+          </div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="85"
+              style="--bar-color:var(--color-rojo);--bar-color2:#FF4D6D"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label">
+            <span>Alteraciones del sueño</span>
+            <span>78%</span>
+          </div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="78"
+              style="--bar-color:var(--color-cian);--bar-color2:var(--color-purpura)"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label">
+            <span>Síndrome visual</span>
+            <span>72%</span>
+          </div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="72"
+              style="--bar-color:var(--color-ambar);--bar-color2:#FF9500"></div>
+          </div>
+        </div>
+        <div class="barra-item">
+          <div class="barra-label">
+            <span>Lesiones en manos y muñecas</span>
+            <span>45%</span>
+          </div>
+          <div class="barra-fondo">
+            <div class="barra-relleno" data-pct="45"
+              style="--bar-color:var(--color-ambar);--bar-color2:var(--color-verde)"></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Tabla resumen -->
     <section class="seccion">
-      <p class="seccion-etiqueta">Resumen</p>
-      <p class="seccion-titulo">Tabla de riesgos</p>
-      <div class="tabla-contenedor">
+      <p class="seccion-etiqueta reveal">Resumen clínico</p>
+      <p class="seccion-titulo reveal delay-1">Tabla de riesgos por área</p>
+      <div class="tabla-contenedor reveal delay-2">
         <table>
           <thead>
             <tr>
-              <th>Área afectada</th>
+              <th>Área del cuerpo</th>
               <th>Consecuencia</th>
               <th>Nivel de riesgo</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Ojos</td>
-              <td>Síndrome visual por computadora</td>
-              <td><span class="badge badge-rojo">Alto</span></td>
-            </tr>
-            <tr>
-              <td>Columna vertebral</td>
-              <td>Dolor cervical y lumbar</td>
-              <td><span class="badge badge-rojo">Alto</span></td>
-            </tr>
-            <tr>
-              <td>Peso y metabolismo</td>
-              <td>Sedentarismo y obesidad</td>
-              <td><span class="badge badge-rojo">Muy alto</span></td>
-            </tr>
-            <tr>
-              <td>Ciclo del sueño</td>
-              <td>Insomnio, falta de melatonina</td>
-              <td><span class="badge badge-rojo">Alto</span></td>
-            </tr>
-            <tr>
-              <td>Manos y muñecas</td>
-              <td>Túnel carpiano, tendinitis</td>
-              <td><span class="badge badge-ambar">Moderado</span></td>
-            </tr>
-            <tr>
-              <td>Cabeza</td>
-              <td>Dolores de cabeza frecuentes</td>
-              <td><span class="badge badge-ambar">Moderado</span></td>
-            </tr>
+            <tr><td>Ojos</td><td>Síndrome visual por computadora</td><td><span class="badge badge-rojo">Alto</span></td></tr>
+            <tr><td>Columna vertebral</td><td>Dolor cervical y lumbar crónico</td><td><span class="badge badge-rojo">Alto</span></td></tr>
+            <tr><td>Peso y metabolismo</td><td>Sedentarismo y obesidad</td><td><span class="badge badge-rojo">Muy alto</span></td></tr>
+            <tr><td>Ciclo del sueño</td><td>Insomnio, déficit de melatonina</td><td><span class="badge badge-rojo">Alto</span></td></tr>
+            <tr><td>Manos y muñecas</td><td>Túnel carpiano, tendinitis</td><td><span class="badge badge-ambar">Moderado</span></td></tr>
+            <tr><td>Cabeza</td><td>Migrañas frecuentes</td><td><span class="badge badge-ambar">Moderado</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -138,33 +206,53 @@
 
     <!-- Soluciones rápidas -->
     <section class="seccion">
-      <p class="seccion-etiqueta">¿Qué puedo hacer?</p>
-      <p class="seccion-titulo">Cómo proteger tu cuerpo</p>
+      <p class="seccion-etiqueta reveal">¿Qué puedo hacer?</p>
+      <p class="seccion-titulo reveal delay-1">Cómo proteger tu cuerpo</p>
       <div class="grid-tarjetas">
-        <div class="tarjeta tarjeta-verde">
-          <div class="tarjeta-icono">👀</div>
+        <div class="tarjeta tarjeta-verde reveal delay-1">
+          <span class="tarjeta-icono">👀</span>
           <h3>Regla 20-20-20</h3>
-          <p>Cada 20 minutos, mira a 6 metros de distancia durante 20 segundos para descansar los ojos.</p>
+          <p>Cada 20 minutos, mira a 6 metros de distancia durante 20 segundos. Esto reduce la fatiga ocular hasta en un 60%.</p>
         </div>
-        <div class="tarjeta tarjeta-verde">
-          <div class="tarjeta-icono">🧘</div>
-          <h3>Postura correcta</h3>
-          <p>Coloca la pantalla a la altura de los ojos. Usa silla con soporte lumbar y descansa cada hora.</p>
+        <div class="tarjeta tarjeta-verde reveal delay-2">
+          <span class="tarjeta-icono">🧘</span>
+          <h3>Postura ergonómica</h3>
+          <p>Coloca la pantalla a la altura de los ojos, usa silla con soporte lumbar y descansa 5 minutos por cada hora de trabajo.</p>
         </div>
-        <div class="tarjeta tarjeta-verde">
-          <div class="tarjeta-icono">🌙</div>
+        <div class="tarjeta tarjeta-verde reveal delay-3">
+          <span class="tarjeta-icono">🌙</span>
           <h3>Sin pantallas antes de dormir</h3>
-          <p>Deja el celular al menos 1 hora antes de acostarte para que tu cuerpo produzca melatonina.</p>
+          <p>Deja el celular al menos 1 hora antes de acostarte para que tu cuerpo produzca melatonina correctamente.</p>
+        </div>
+        <div class="tarjeta tarjeta-verde reveal delay-4">
+          <span class="tarjeta-icono">🏃</span>
+          <h3>Movimiento constante</h3>
+          <p>Levántate y mueve el cuerpo al menos 5 minutos por cada hora que pases sentado frente a una pantalla.</p>
         </div>
       </div>
     </section>
 
+    <div class="nav-paginas reveal">
+      <a href="index.html">← Inicio</a>
+      <a href="salud-mental.html">Salud mental →</a>
+    </div>
+
   </main>
 
   <footer class="footer">
-    <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
