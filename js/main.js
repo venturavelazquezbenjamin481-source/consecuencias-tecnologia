@@ -305,3 +305,151 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+/* ---- Mapa corporal interactivo ---- */
+const DATOS_CUERPO = {
+  ojos: {
+    icono: '👁️',
+    titulo: 'Ojos — Síndrome Visual Digital',
+    color: '#FF4D6D',
+    nivel: 'Alto riesgo',
+    desc: 'Las pantallas reducen el parpadeo de 15-20 veces por minuto a solo 3-4 veces, provocando resequedad severa, tensión ocular y daño a la córnea a largo plazo.',
+    lista: [
+      'Síndrome visual por computadora (CVS)',
+      'Ojos secos y enrojecimiento crónico',
+      'Visión borrosa y dificultad para enfocar',
+      'Sensibilidad a la luz (fotofobia)',
+      'Dolores de cabeza de origen ocular'
+    ]
+  },
+  cerebro: {
+    icono: '🧠',
+    titulo: 'Cerebro — Sobreestimulación digital',
+    color: '#A855F7',
+    nivel: 'Crítico',
+    desc: 'El flujo constante de notificaciones mantiene al cerebro en estado de alerta permanente, agotando el sistema nervioso y reduciendo la capacidad de concentración profunda.',
+    lista: [
+      'Reducción de la capacidad de concentración',
+      'Fatiga cognitiva acumulada',
+      'Dificultad para el pensamiento crítico',
+      'Alteración del ciclo de sueño (melatonina)',
+      'Sobreproducción de cortisol (estrés)'
+    ]
+  },
+  cuello: {
+    icono: '🦴',
+    titulo: 'Cuello — Tech Neck',
+    color: '#FFB800',
+    nivel: 'Crónico',
+    desc: 'Al inclinar la cabeza 60° hacia el celular, el cuello soporta hasta 27 kg de presión. Con el tiempo, esto genera daño vertebral irreversible en la columna cervical.',
+    lista: [
+      'Dolor cervical crónico',
+      'Compresión de discos intervertebrales',
+      'Tensión severa en músculos trapecio',
+      'Cefaleas tensionales frecuentes',
+      'En casos graves: hernia cervical'
+    ]
+  },
+  corazon: {
+    icono: '🫀',
+    titulo: 'Sistema cardiovascular — Sedentarismo',
+    color: '#FF4D6D',
+    nivel: 'Muy alto riesgo',
+    desc: 'Permanecer inmóvil horas frente a pantallas reduce el gasto energético, eleva la presión arterial y dispara el riesgo de enfermedades del corazón desde edades tempranas.',
+    lista: [
+      'Aumento del riesgo cardiovascular',
+      'Presión arterial elevada',
+      'Riesgo elevado de diabetes tipo 2',
+      'Mala circulación y retención de líquidos',
+      'Aumento de peso y obesidad abdominal'
+    ]
+  },
+  columna: {
+    icono: '🦴',
+    titulo: 'Columna lumbar — Daño postural',
+    color: '#FF4D6D',
+    nivel: 'Alto riesgo',
+    desc: 'Sentarse durante horas con postura incorrecta comprime los discos intervertebrales lumbares y debilita progresivamente la musculatura de soporte de la espalda.',
+    lista: [
+      'Dolor lumbar crónico',
+      'Escoliosis postural adquirida',
+      'Compresión de nervios (ciática)',
+      'Hernia de disco lumbar',
+      'Atrofia de la musculatura paravertebral'
+    ]
+  },
+  munecas: {
+    icono: '🤲',
+    titulo: 'Manos y muñecas — Lesiones RSI',
+    color: '#FFB800',
+    nivel: 'Moderado',
+    desc: 'Los movimientos repetitivos al escribir y deslizar en pantallas inflaman tendones y comprimen el nervio mediano en el túnel carpiano, generando dolor crónico.',
+    lista: [
+      'Síndrome del túnel carpiano',
+      '"WhatsApp thumb" — tendinitis en el pulgar',
+      'Codo de ratón (epicondilitis lateral)',
+      'Tendinitis en muñecas',
+      'Entumecimiento y hormigueo en dedos'
+    ]
+  },
+  piernas: {
+    icono: '🦵',
+    titulo: 'Piernas — Circulación y sedentarismo',
+    color: '#00D4FF',
+    nivel: 'Moderado',
+    desc: 'Pasar horas sentado reduce el flujo sanguíneo en las extremidades inferiores, favorece la formación de coágulos y acelera la aparición de várices a edades jóvenes.',
+    lista: [
+      'Mala circulación venosa crónica',
+      'Riesgo de trombosis venosa profunda',
+      'Aparición temprana de várices',
+      'Atrofia muscular progresiva',
+      'Calambres y entumecimiento frecuentes'
+    ]
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const hotspots  = document.querySelectorAll('.hotspot');
+  const panel     = document.querySelector('.cuerpo-panel');
+  if (!hotspots.length || !panel) return;
+
+  const panelVacio = panel.querySelector('.cuerpo-panel-vacio');
+  const panelInfo  = panel.querySelector('.cuerpo-panel-info');
+
+  function mostrarDato(id) {
+    const datos = DATOS_CUERPO[id];
+    if (!datos) return;
+
+    hotspots.forEach(h => h.classList.remove('activo'));
+    document.querySelectorAll(`.hotspot[data-id="${id}"]`).forEach(h => h.classList.add('activo'));
+    document.querySelectorAll(`.cuerpo-btn-zona`).forEach(b => {
+      b.classList.toggle('activo', b.dataset.id === id);
+    });
+
+    panel.style.borderColor = datos.color + '55';
+    panel.classList.add('tiene-dato');
+    panelVacio.style.display = 'none';
+    panelInfo.style.display  = 'block';
+
+    panelInfo.innerHTML = `
+      <span class="cuerpo-panel-icono">${datos.icono}</span>
+      <div class="cuerpo-panel-titulo" style="color:${datos.color}">${datos.titulo}</div>
+      <span class="cuerpo-panel-nivel" style="color:${datos.color}; border-color:${datos.color}">${datos.nivel}</span>
+      <p class="cuerpo-panel-desc">${datos.desc}</p>
+      <ul class="cuerpo-panel-lista" style="--li-color:${datos.color}">
+        ${datos.lista.map(item => `<li style="--li-color:${datos.color}"><span style="color:${datos.color}">▸</span> ${item}</li>`).join('')}
+      </ul>
+    `;
+  }
+
+  hotspots.forEach(hs => {
+    hs.addEventListener('click', () => mostrarDato(hs.dataset.id));
+  });
+
+  document.querySelectorAll('.cuerpo-btn-zona').forEach(btn => {
+    btn.addEventListener('click', () => mostrarDato(btn.dataset.id));
+  });
+
+  /* Mostrar el primer hotspot por defecto */
+  mostrarDato('ojos');
+});

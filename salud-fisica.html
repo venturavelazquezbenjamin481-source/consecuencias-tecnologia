@@ -68,6 +68,129 @@
       </div>
     </section>
 
+    <!-- Mapa corporal interactivo -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal">Mapa de daño</p>
+      <p class="seccion-titulo reveal delay-1">¿Qué partes del cuerpo afecta?</p>
+      <p class="seccion-descripcion reveal delay-2">
+        Haz clic en cada punto rojo del cuerpo para ver el impacto detallado en esa zona.
+      </p>
+
+      <!-- Botones zona (solo en móvil) -->
+      <div class="cuerpo-botones-movil reveal delay-3">
+        <button class="cuerpo-btn-zona" data-id="ojos"    style="color:#FF4D6D;border-color:#FF4D6D">👁️ Ojos</button>
+        <button class="cuerpo-btn-zona" data-id="cerebro" style="color:#A855F7;border-color:#A855F7">🧠 Cerebro</button>
+        <button class="cuerpo-btn-zona" data-id="cuello"  style="color:#FFB800;border-color:#FFB800">🦴 Cuello</button>
+        <button class="cuerpo-btn-zona" data-id="corazon" style="color:#FF4D6D;border-color:#FF4D6D">🫀 Corazón</button>
+        <button class="cuerpo-btn-zona" data-id="columna" style="color:#FF4D6D;border-color:#FF4D6D">🦴 Columna</button>
+        <button class="cuerpo-btn-zona" data-id="munecas" style="color:#FFB800;border-color:#FFB800">🤲 Muñecas</button>
+        <button class="cuerpo-btn-zona" data-id="piernas" style="color:#00D4FF;border-color:#00D4FF">🦵 Piernas</button>
+      </div>
+
+      <div class="cuerpo-interactivo reveal delay-3">
+
+        <!-- SVG del cuerpo humano -->
+        <div class="cuerpo-svg-wrap">
+          <svg class="cuerpo-svg" viewBox="0 0 200 490" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="glow-cuerpo" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- Silueta del cuerpo -->
+            <g stroke="rgba(0,212,255,0.55)" stroke-width="1.5" fill="rgba(0,212,255,0.05)" filter="url(#glow-cuerpo)">
+              <!-- Cabeza -->
+              <circle cx="100" cy="50" r="40"/>
+              <!-- Ojos (detalle) -->
+              <ellipse cx="87"  cy="47" rx="7" ry="5.5" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.7)"/>
+              <ellipse cx="113" cy="47" rx="7" ry="5.5" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.7)"/>
+              <!-- Cuello -->
+              <rect x="87" y="89" width="26" height="22" rx="5"/>
+              <!-- Torso -->
+              <path d="M 45 111 Q 28 130 31 172 L 36 232 Q 36 265 55 278 L 145 278 Q 164 265 164 232 L 169 172 Q 172 130 155 111 Z"/>
+              <!-- Brazo izquierdo -->
+              <path d="M 45 116 L 20 202 L 16 252 L 30 258 L 36 208 L 60 122 Z"/>
+              <!-- Mano izquierda -->
+              <ellipse cx="23" cy="264" rx="14" ry="9" transform="rotate(-18 23 264)"/>
+              <!-- Brazo derecho -->
+              <path d="M 155 116 L 180 202 L 184 252 L 170 258 L 164 208 L 140 122 Z"/>
+              <!-- Mano derecha -->
+              <ellipse cx="177" cy="264" rx="14" ry="9" transform="rotate(18 177 264)"/>
+              <!-- Pierna izquierda (muslo) -->
+              <path d="M 55 278 L 46 368 L 72 372 L 88 285 Z"/>
+              <!-- Pierna izquierda (gemelo) -->
+              <path d="M 46 368 L 43 450 L 70 452 L 72 372 Z"/>
+              <!-- Pie izquierdo -->
+              <ellipse cx="52" cy="458" rx="22" ry="9"/>
+              <!-- Pierna derecha (muslo) -->
+              <path d="M 145 278 L 154 368 L 128 372 L 112 285 Z"/>
+              <!-- Pierna derecha (gemelo) -->
+              <path d="M 154 368 L 157 450 L 130 452 L 128 372 Z"/>
+              <!-- Pie derecho -->
+              <ellipse cx="148" cy="458" rx="22" ry="9"/>
+            </g>
+
+            <!-- ===== HOTSPOTS ===== -->
+
+            <!-- Ojos -->
+            <g class="hotspot" data-id="ojos">
+              <circle class="hotspot-ring" cx="100" cy="47" r="14" fill="rgba(255,77,109,0.15)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="100" cy="47" r="7"  fill="#FF4D6D"/>
+            </g>
+
+            <!-- Cerebro (parte superior cabeza) -->
+            <g class="hotspot" data-id="cerebro">
+              <circle class="hotspot-ring" cx="100" cy="25" r="13" fill="rgba(168,85,247,0.15)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="100" cy="25" r="6"  fill="#A855F7"/>
+            </g>
+
+            <!-- Cuello -->
+            <g class="hotspot" data-id="cuello">
+              <circle class="hotspot-ring" cx="100" cy="100" r="13" fill="rgba(255,184,0,0.15)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="100" cy="100" r="6"  fill="#FFB800"/>
+            </g>
+
+            <!-- Corazón (pecho izquierdo) -->
+            <g class="hotspot" data-id="corazon">
+              <circle class="hotspot-ring" cx="82" cy="155" r="14" fill="rgba(255,77,109,0.15)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="82" cy="155" r="7"  fill="#FF4D6D"/>
+            </g>
+
+            <!-- Columna lumbar -->
+            <g class="hotspot" data-id="columna">
+              <circle class="hotspot-ring" cx="100" cy="218" r="14" fill="rgba(255,77,109,0.15)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="100" cy="218" r="7"  fill="#FF4D6D"/>
+            </g>
+
+            <!-- Muñeca izquierda -->
+            <g class="hotspot" data-id="munecas">
+              <circle class="hotspot-ring" cx="22" cy="254" r="13" fill="rgba(255,184,0,0.15)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="22" cy="254" r="6"  fill="#FFB800"/>
+            </g>
+
+            <!-- Piernas (muslo izquierdo) -->
+            <g class="hotspot" data-id="piernas">
+              <circle class="hotspot-ring" cx="62" cy="330" r="14" fill="rgba(0,212,255,0.18)" stroke="none"/>
+              <circle class="hotspot-dot"  cx="62" cy="330" r="7"  fill="#00D4FF"/>
+            </g>
+
+          </svg>
+        </div>
+
+        <!-- Panel de información -->
+        <div class="cuerpo-panel">
+          <div class="cuerpo-panel-vacio">
+            <span class="flecha">←</span>
+            <p>Selecciona un punto del cuerpo</p>
+          </div>
+          <div class="cuerpo-panel-info"></div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- Consecuencias principales -->
     <section class="seccion">
       <p class="seccion-etiqueta reveal">Áreas afectadas</p>

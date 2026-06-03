@@ -1119,3 +1119,219 @@ tbody td:first-child { color: var(--texto-primario); font-weight: 500; }
   .estadisticas { grid-template-columns: 1fr; }
   .grid-tarjetas { grid-template-columns: 1fr; }
 }
+
+/* ============================================
+   MAPA CORPORAL INTERACTIVO
+   ============================================ */
+
+.cuerpo-interactivo {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+  margin: 2rem 0;
+}
+
+.cuerpo-svg-wrap {
+  position: sticky;
+  top: 85px;
+  display: flex;
+  justify-content: center;
+}
+
+.cuerpo-svg {
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.12));
+}
+
+/* Hotspots */
+.hotspot {
+  cursor: pointer;
+}
+
+.hotspot-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hotspot-pulso 2.2s ease-in-out infinite;
+}
+
+.hotspot-dot {
+  transition: all 0.25s;
+}
+
+.hotspot:hover .hotspot-dot {
+  filter: brightness(1.4) drop-shadow(0 0 6px currentColor);
+}
+
+.hotspot.activo .hotspot-ring {
+  animation: hotspot-pulso-activo 1.2s ease-in-out infinite;
+}
+
+.hotspot.activo .hotspot-dot {
+  filter: brightness(1.6) drop-shadow(0 0 10px currentColor);
+}
+
+@keyframes hotspot-pulso {
+  0%, 100% { transform: scale(1);   opacity: 0.35; }
+  50%       { transform: scale(1.7); opacity: 0; }
+}
+
+@keyframes hotspot-pulso-activo {
+  0%, 100% { transform: scale(1);   opacity: 0.55; }
+  50%       { transform: scale(2);   opacity: 0; }
+}
+
+/* Panel de información */
+.cuerpo-panel {
+  background: var(--bg-tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-grande);
+  padding: 2.25rem;
+  backdrop-filter: blur(12px);
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.4s;
+}
+
+.cuerpo-panel.tiene-dato {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.cuerpo-panel-vacio {
+  text-align: center;
+  color: var(--texto-secundario);
+  opacity: 0.5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cuerpo-panel-vacio .flecha {
+  font-family: var(--fuente-titulo);
+  font-size: 1.5rem;
+  color: var(--color-cian);
+  opacity: 0.4;
+  animation: flotar-lento 3s ease-in-out infinite;
+}
+
+.cuerpo-panel-vacio p {
+  font-family: var(--fuente-titulo);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.cuerpo-panel-info {
+  width: 100%;
+  display: none;
+  animation: fade-arriba 0.4s ease;
+}
+
+.cuerpo-panel-icono {
+  font-size: 2.75rem;
+  margin-bottom: 1rem;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.cuerpo-panel-titulo {
+  font-family: var(--fuente-titulo);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.cuerpo-panel-nivel {
+  display: inline-block;
+  font-family: var(--fuente-titulo);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  margin-bottom: 1.25rem;
+}
+
+.cuerpo-panel-desc {
+  font-size: 14px;
+  color: var(--texto-secundario);
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.cuerpo-panel-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cuerpo-panel-lista li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--texto-secundario);
+  line-height: 1.55;
+}
+
+.cuerpo-panel-lista li::before {
+  content: '▸';
+  flex-shrink: 0;
+  margin-top: 1px;
+  text-shadow: 0 0 6px currentColor;
+}
+
+/* Botones de hotspot en móvil */
+.cuerpo-botones-movil {
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.cuerpo-btn-zona {
+  font-family: var(--fuente-titulo);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.cuerpo-btn-zona:hover,
+.cuerpo-btn-zona.activo {
+  opacity: 1;
+}
+
+@media (max-width: 860px) {
+  .cuerpo-interactivo {
+    grid-template-columns: 1fr;
+  }
+  .cuerpo-svg-wrap {
+    position: static;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+  .cuerpo-botones-movil { display: flex; }
+}
+
+@media (max-width: 480px) {
+  .cuerpo-svg-wrap { max-width: 180px; }
+}
