@@ -3,8 +3,8 @@
 <head> <link rel="stylesheet" href="css/styles.css" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tecnología y sus consecuencias</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>TecnoImpacto — Consecuencias del uso de la tecnología</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -17,47 +17,66 @@
         <li><a href="salud-fisica.html">Salud física</a></li>
         <li><a href="salud-mental.html">Salud mental</a></li>
         <li><a href="sociedad.html">Sociedad</a></li>
-        <li><a href="ambiente.html">Medio ambiente</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
       </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
   <!-- Hero -->
   <header class="hero">
-    <span class="hero-etiqueta">Proyecto educativo · 2026</span>
-    <h1>¿Qué le hace la tecnología a nuestras vidas?</h1>
+    <span class="hero-etiqueta">
+      <span class="dot"></span>
+      Proyecto educativo · 2026
+    </span>
+    <h1>
+      ¿Qué le hace la<br>
+      <span class="texto-cian">tecnología</span><br>
+      a nuestras vidas?
+    </h1>
     <p>
-      Un análisis de las consecuencias del uso de dispositivos tecnológicos
-      en la salud, las relaciones, la sociedad y el planeta.
+      Un análisis profundo de las consecuencias del uso de dispositivos digitales
+      en la salud física, la mente, las relaciones sociales y el planeta.
     </p>
     <div class="btn-grupo">
-      <a href="salud-fisica.html" class="btn btn-primario">Explorar consecuencias</a>
-      <a href="soluciones.html" class="btn btn-secundario">Ver soluciones</a>
+      <a href="salud-fisica.html" class="btn btn-primario">
+        <span>⚡</span> Explorar consecuencias
+      </a>
+      <a href="soluciones.html" class="btn btn-secundario">
+        <span>✦</span> Ver soluciones
+      </a>
     </div>
+    <div class="hero-scroll">Scroll</div>
   </header>
 
   <main class="contenedor">
 
     <!-- Estadísticas -->
     <section class="seccion">
-      <p class="seccion-etiqueta">Datos clave</p>
-      <p class="seccion-titulo">El impacto en números</p>
+      <p class="seccion-etiqueta reveal">Datos globales</p>
+      <p class="seccion-titulo reveal delay-1">El impacto en números</p>
+      <p class="seccion-descripcion reveal delay-2">
+        Las cifras son contundentes. El uso desmedido de tecnología tiene
+        consecuencias medibles en millones de personas alrededor del mundo.
+      </p>
       <div class="estadisticas">
-        <div class="estadistica-item">
-          <div class="estadistica-numero" style="color: var(--color-rojo);">7h</div>
-          <p class="estadistica-descripcion">Promedio diario de tiempo frente a pantallas en adultos</p>
+        <div class="estadistica-item reveal delay-1" style="--glow-color: var(--color-rojo)">
+          <span class="estadistica-numero" style="color:var(--color-rojo)" data-objetivo="7h">0h</span>
+          <p class="estadistica-descripcion">Promedio diario frente a pantallas en adultos</p>
         </div>
-        <div class="estadistica-item">
-          <div class="estadistica-numero" style="color: var(--color-ambar);">58%</div>
+        <div class="estadistica-item reveal delay-2" style="--glow-color: var(--color-ambar)">
+          <span class="estadistica-numero" style="color:var(--color-ambar)" data-objetivo="58%">0%</span>
           <p class="estadistica-descripcion">De jóvenes reportan ansiedad relacionada con el uso digital</p>
         </div>
-        <div class="estadistica-item">
-          <div class="estadistica-numero" style="color: var(--color-azul);">4.9B</div>
+        <div class="estadistica-item reveal delay-3" style="--glow-color: var(--color-cian)">
+          <span class="estadistica-numero" style="color:var(--color-cian)" data-objetivo="4.9B">0B</span>
           <p class="estadistica-descripcion">Usuarios activos de redes sociales en el mundo</p>
         </div>
-        <div class="estadistica-item">
-          <div class="estadistica-numero" style="color: var(--color-verde);">+40%</div>
+        <div class="estadistica-item reveal delay-4" style="--glow-color: var(--color-verde)">
+          <span class="estadistica-numero" style="color:var(--color-verde)" data-objetivo="+40%">+0%</span>
           <p class="estadistica-descripcion">Aumento en emisiones de CO₂ del sector tecnológico</p>
         </div>
       </div>
@@ -65,51 +84,106 @@
 
     <!-- Áreas de impacto -->
     <section class="seccion">
-      <p class="seccion-etiqueta">Áreas de impacto</p>
-      <p class="seccion-titulo">Consecuencias principales</p>
-      <p class="seccion-descripcion">
+      <p class="seccion-etiqueta reveal">Áreas de impacto</p>
+      <p class="seccion-titulo reveal delay-1">Consecuencias principales</p>
+      <p class="seccion-descripcion reveal delay-2">
         El uso excesivo o inadecuado de la tecnología afecta múltiples dimensiones
-        de nuestra vida. Aquí exploramos las más importantes.
+        de nuestra vida. Explora cada área para conocer los detalles.
       </p>
       <div class="grid-tarjetas">
-        <a href="salud-fisica.html" class="tarjeta tarjeta-rojo" style="text-decoration:none; color:inherit;">
-          <div class="tarjeta-icono">🫀</div>
+        <a href="salud-fisica.html" class="tarjeta tarjeta-rojo reveal delay-1" style="text-decoration:none; color:inherit;">
+          <span class="tarjeta-icono">🫀</span>
           <h3>Salud física <span class="badge badge-rojo">Alto riesgo</span></h3>
-          <p>Sedentarismo, problemas posturales, fatiga visual y alteraciones del sueño.</p>
+          <p>Sedentarismo, daño postural, fatiga visual, insomnio y lesiones por movimiento repetitivo.</p>
         </a>
-        <a href="salud-mental.html" class="tarjeta tarjeta-ambar" style="text-decoration:none; color:inherit;">
-          <div class="tarjeta-icono">🧠</div>
-          <h3>Salud mental <span class="badge badge-ambar">Moderado</span></h3>
+        <a href="salud-mental.html" class="tarjeta tarjeta-purpura reveal delay-2" style="text-decoration:none; color:inherit;">
+          <span class="tarjeta-icono">🧠</span>
+          <h3>Salud mental <span class="badge badge-purpura">Crítico</span></h3>
           <p>Adicción a pantallas, ansiedad, depresión y comparación social constante.</p>
         </a>
-        <a href="sociedad.html" class="tarjeta tarjeta-azul" style="text-decoration:none; color:inherit;">
-          <div class="tarjeta-icono">👥</div>
-          <h3>Relaciones sociales <span class="badge badge-azul">En estudio</span></h3>
-          <p>Aislamiento, disminución de empatía y crecimiento del cyberbullying.</p>
+        <a href="sociedad.html" class="tarjeta tarjeta-azul reveal delay-3" style="text-decoration:none; color:inherit;">
+          <span class="tarjeta-icono">👥</span>
+          <h3>Relaciones sociales <span class="badge badge-azul">En crecimiento</span></h3>
+          <p>Aislamiento, cyberbullying, polarización y pérdida de habilidades interpersonales.</p>
         </a>
-        <a href="ambiente.html" class="tarjeta tarjeta-verde" style="text-decoration:none; color:inherit;">
-          <div class="tarjeta-icono">🌍</div>
+        <a href="ambiente.html" class="tarjeta tarjeta-verde reveal delay-4" style="text-decoration:none; color:inherit;">
+          <span class="tarjeta-icono">🌍</span>
           <h3>Medio ambiente <span class="badge badge-verde">Global</span></h3>
-          <p>Residuos electrónicos, consumo energético y obsolescencia programada.</p>
+          <p>Residuos electrónicos, consumo energético masivo y obsolescencia programada.</p>
         </a>
+      </div>
+    </section>
+
+    <!-- Línea de tiempo del impacto -->
+    <section class="seccion">
+      <p class="seccion-etiqueta reveal">Cronología</p>
+      <p class="seccion-titulo reveal delay-1">¿Cuándo empiezan los efectos?</p>
+      <p class="seccion-descripcion reveal delay-2">
+        Los efectos del uso excesivo de tecnología no son instantáneos,
+        pero sí progresivos. Así se desarrollan con el tiempo.
+      </p>
+      <div class="linea-tiempo">
+        <div class="tiempo-item reveal delay-1">
+          <h4>Días 1–7 · Uso intensivo</h4>
+          <p>Fatiga visual, dificultad para conciliar el sueño y dolores de cabeza frecuentes aparecen en la primera semana de uso excesivo.</p>
+        </div>
+        <div class="tiempo-item reveal delay-2">
+          <h4>Semanas 2–4 · Hábito formado</h4>
+          <p>El cerebro comienza a asociar el celular con la dopamina. Aumenta la ansiedad al no tenerlo a la mano. La postura empieza a deteriorarse.</p>
+        </div>
+        <div class="tiempo-item reveal delay-3">
+          <h4>Meses 1–3 · Consecuencias visibles</h4>
+          <p>Sedentarismo marcado, comparación social intensa, reducción de la concentración y primeras señales de aislamiento social.</p>
+        </div>
+        <div class="tiempo-item reveal delay-4">
+          <h4>Más de 6 meses · Efectos crónicos</h4>
+          <p>Problemas musculoesqueléticos, trastornos del sueño consolidados, dependencia digital y posibles trastornos de ansiedad clínicos.</p>
+        </div>
       </div>
     </section>
 
     <!-- Cita -->
     <section class="seccion">
-      <blockquote class="cita">
+      <blockquote class="cita reveal">
         "La tecnología es una herramienta poderosa. Como todo instrumento,
         sus consecuencias dependen de cómo decidamos usarla.
-        El primer paso es conocerlas."
+        El primer paso es conocerlas, el segundo es actuar."
       </blockquote>
+    </section>
+
+    <!-- CTA a soluciones -->
+    <section class="seccion">
+      <div class="tarjeta tarjeta-verde reveal" style="padding: 3rem; text-align: center;">
+        <span class="tarjeta-icono" style="text-align:center; width:100%;">✦</span>
+        <h3 style="justify-content:center; font-size:1rem; margin-bottom:1rem;">
+          El conocimiento es el primer paso
+        </h3>
+        <p style="max-width:480px; margin:0 auto 2rem;">
+          Ahora que conoces los riesgos, descubre estrategias concretas para
+          usar la tecnología de forma más saludable y consciente.
+        </p>
+        <a href="soluciones.html" class="btn btn-primario" style="margin:0 auto; display:inline-flex;">
+          <span>✦</span> Ver soluciones
+        </a>
+      </div>
     </section>
 
   </main>
 
   <footer class="footer">
-    <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
