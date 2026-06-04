@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TecnoDefensa — TecnoImpacto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ---- Juego nave: layout ---- */
+    .nave-hero {
+      min-height: 32vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 1.5rem 2rem;
+    }
+
+    #nave-wrapper {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+
+    /* ---- Marco del juego ---- */
+    .juego-marco {
+      position: relative;
+      background: var(--bg-tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-grande);
+      padding: 0.75rem;
+      box-shadow: var(--sombra-cian);
+      overflow: hidden;
+    }
+    .juego-marco::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ---- HUD ---- */
+    .nave-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem 0.85rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .hud-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--fuente-titulo);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+    }
+    .hud-label { color: var(--texto-secundario); }
+    .hud-valor-cian   { color: var(--color-cian); }
+    .hud-valor-verde  { color: var(--color-verde); }
+    .hud-valor-ambar  { color: var(--color-ambar); }
+    .hud-valor-rojo   { color: var(--color-rojo); }
+    .hud-vidas { letter-spacing: 0.1em; }
+
+    /* ---- Canvas ---- */
+    #canvas-juego {
+      display: block;
+      width: 100%;
+      border-radius: var(--radio);
+      background:
+        radial-gradient(ellipse at 50% 120%, rgba(168,85,247,.10) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% -20%, rgba(0,212,255,.10) 0%, transparent 60%),
+        #04070E;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* ---- Overlays (inicio / pausa / game over) ---- */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: rgba(4, 7, 14, 0.82);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: var(--radio-grande);
+      z-index: 5;
+      animation: fade-arriba 0.4s ease both;
+    }
+    .overlay.oculto { display: none; }
+
+    .overlay-icono {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 18px var(--color-cian));
+      animation: flotar 3s ease-in-out infinite;
+    }
+    .overlay-titulo {
+      font-family: var(--fuente-titulo);
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 900;
+      color: var(--color-cian);
+      text-shadow: 0 0 20px rgba(0,212,255,.5);
+      margin-bottom: 0.75rem;
+    }
+    .overlay-desc {
+      color: var(--texto-secundario);
+      max-width: 440px;
+      margin: 0 auto 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Instrucciones de control ---- */
+    .controles-info {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+    .control-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,212,255,.07);
+      border: 1px solid rgba(0,212,255,.2);
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.78rem;
+      color: var(--texto-primario);
+    }
+    .control-chip kbd {
+      font-family: var(--fuente-titulo);
+      font-size: 0.65rem;
+      background: rgba(0,212,255,.15);
+      border: 1px solid rgba(0,212,255,.3);
+      border-radius: 5px;
+      padding: 0.15rem 0.45rem;
+      color: var(--color-cian);
+    }
+
+    /* ---- Leyenda de objetivos ---- */
+    .leyenda-enemigos {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+      padding: 1rem;
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--borde-suave);
+      border-radius: var(--radio);
+    }
+    .leyenda-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--texto-secundario);
+    }
+    .leyenda-emoji { font-size: 1.1rem; }
+
+    /* ---- Botón táctil de disparo (móvil) ---- */
+    .nave-controles-movil {
+      display: none;
+      gap: 0.75rem;
+      margin-top: 0.85rem;
+    }
+    .nave-controles-movil button {
+      flex: 1;
+      padding: 1.1rem;
+      background: rgba(0,212,255,.08);
+      border: 1px solid rgba(0,212,255,.25);
+      border-radius: var(--radio);
+      color: var(--color-cian);
+      font-family: var(--fuente-titulo);
+      font-size: 1.3rem;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .nave-controles-movil button:active {
+      background: rgba(0,212,255,.2);
+      transform: scale(0.96);
+    }
+    @media (max-width: 760px) {
+      .nave-controles-movil { display: flex; }
+    }
+
+    /* ---- Resultado final desglose ---- */
+    .final-stats {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+    .final-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 0.9rem 1.4rem;
+      min-width: 90px;
+    }
+    .final-chip-num {
+      font-family: var(--fuente-titulo);
+      font-size: 1.6rem;
+      font-weight: 900;
+    }
+    .final-chip-label {
+      font-size: 0.7rem;
+      color: var(--texto-secundario);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <nav class="nav-principal">
+    <div class="nav-interior">
+      <a href="index.html" class="nav-logo">TecnoImpacto</a>
+      <ul class="nav-enlaces">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+        <li><a href="juego.html" class="nav-juego-link">🎮 Juego</a></li>
+      </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="nave-hero">
+    <p class="seccion-etiqueta" style="margin-bottom:1rem;">Modo arcade</p>
+    <h1 style="font-family:var(--fuente-titulo); font-size:clamp(2rem,5vw,3rem); font-weight:900; text-align:center; margin-bottom:0.5rem;">
+      <span class="texto-cian">TecnoDefensa</span>
+    </h1>
+    <p style="color:var(--texto-secundario); text-align:center; max-width:480px;">
+      Pilotea tu nave y destruye las consecuencias negativas del uso excesivo de tecnología antes de que te alcancen.
+    </p>
+  </header>
+
+  <!-- Área del juego -->
+  <div id="nave-wrapper">
+    <div class="juego-marco">
+
+      <!-- HUD -->
+      <div class="nave-hud">
+        <div class="hud-item">
+          <span class="hud-label">PUNTOS</span>
+          <span class="hud-valor-cian" id="hud-puntos">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">NIVEL</span>
+          <span class="hud-valor-verde" id="hud-nivel">1</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">RÉCORD</span>
+          <span class="hud-valor-ambar" id="hud-record">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">VIDAS</span>
+          <span class="hud-valor-rojo hud-vidas" id="hud-vidas">❤❤❤</span>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <canvas id="canvas-juego" width="680" height="520"></canvas>
+
+      <!-- Overlay: inicio -->
+      <div class="overlay" id="overlay-inicio">
+        <span class="overlay-icono">🚀</span>
+        <h2 class="overlay-titulo">¿Listo para defender?</h2>
+        <p class="overlay-desc">
+          Las consecuencias negativas de la tecnología descienden hacia ti.
+          Dispárales antes de que lleguen abajo. ¡Protege tu bienestar digital!
+        </p>
+        <div class="controles-info">
+          <span class="control-chip"><kbd>← →</kbd> Mover</span>
+          <span class="control-chip"><kbd>ESPACIO</kbd> Disparar</span>
+          <span class="control-chip">🖱 Mouse / táctil</span>
+        </div>
+        <button class="btn btn-primario" id="btn-jugar" style="margin:0 auto;">
+          <span>🎯</span> Comenzar
+        </button>
+      </div>
+
+      <!-- Overlay: pausa -->
+      <div class="overlay oculto" id="overlay-pausa">
+        <span class="overlay-icono">⏸</span>
+        <h2 class="overlay-titulo">Pausa</h2>
+        <p class="overlay-desc">El juego está en pausa. Tómate un respiro digital.</p>
+        <button class="btn btn-primario" id="btn-reanudar" style="margin:0 auto;">
+          <span>▶</span> Continuar
+        </button>
+      </div>
+
+      <!-- Overlay: game over -->
+      <div class="overlay oculto" id="overlay-fin">
+        <span class="overlay-icono" id="fin-icono">🛸</span>
+        <h2 class="overlay-titulo" id="fin-titulo">Fin de la partida</h2>
+        <p class="overlay-desc" id="fin-desc">Las consecuencias te alcanzaron. ¡Inténtalo de nuevo!</p>
+        <div class="final-stats">
+          <div class="final-chip">
+            <span class="final-chip-num hud-valor-cian" id="fin-puntos">0</span>
+            <span class="final-chip-label">Puntos</span>
+          </div>
+          <div class="final-chip">
+            <span class="final-chip-num hud-valor-verde" id="fin-eliminados">0</span>
+            <span class="final-chip-label">Destruidos</span>
+          </div>
+          <div class="final-chip">
+            <span class="final-chip-num hud-valor-ambar" id="fin-nivel">1</span>
+            <span class="final-chip-label">Nivel</span>
+          </div>
+        </div>
+        <button class="btn btn-primario" id="btn-reiniciar" style="margin:0 auto;">
+          <span>🔄</span> Jugar de nuevo
+        </button>
+      </div>
+
+    </div><!-- /juego-marco -->
+
+    <!-- Controles móviles -->
+    <div class="nave-controles-movil">
+      <button id="btn-izq" aria-label="Mover izquierda">◀</button>
+      <button id="btn-disparo" aria-label="Disparar">🔥</button>
+      <button id="btn-der" aria-label="Mover derecha">▶</button>
+    </div>
+
+    <!-- Leyenda de enemigos -->
+    <div class="leyenda-enemigos">
+      <div class="leyenda-item"><span class="leyenda-emoji">😰</span> Ansiedad</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">😴</span> Insomnio</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">🛋️</span> Sedentarismo</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">👁️</span> Fatiga visual</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">📵</span> Aislamiento</div>
+    </div>
+  </div><!-- /nave-wrapper -->
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+        <li><a href="juego.html">Juego</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+  /* ============================================
+     TecnoDefensa — juego arcade estilo Galaga
+     ============================================ */
+  (function () {
+    const canvas = document.getElementById('canvas-juego');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    /* ---- Tipos de enemigos (consecuencias negativas) ---- */
+    const TIPOS_ENEMIGO = [
+      { emoji: '😰', nombre: 'Ansiedad',      color: '#A855F7', puntos: 10 },
+      { emoji: '😴', nombre: 'Insomnio',      color: '#00D4FF', puntos: 10 },
+      { emoji: '🛋️', nombre: 'Sedentarismo',  color: '#FF4D6D', puntos: 15 },
+      { emoji: '👁️', nombre: 'Fatiga visual', color: '#FFB800', puntos: 15 },
+      { emoji: '📵', nombre: 'Aislamiento',   color: '#00FF88', puntos: 20 }
+    ];
+
+    /* ---- Estado global ---- */
+    let estado = 'inicio'; // inicio | jugando | pausa | fin
+    let puntos = 0;
+    let nivel = 1;
+    let vidas = 3;
+    let eliminados = 0;
+    let record = parseInt(localStorage.getItem('tecnodefensa-record') || '0', 10);
+
+    /* ---- Nave del jugador ---- */
+    const nave = {
+      x: W / 2,
+      y: H - 50,
+      ancho: 44,
+      alto: 34,
+      velocidad: 6,
+      cooldown: 0
+    };
+
+    /* ---- Colecciones ---- */
+    let balas = [];
+    let enemigos = [];
+    let particulas = [];
+    let estrellas = [];
+
+    /* ---- Control de oleadas ---- */
+    let tiempoSpawn = 0;
+    let intervaloSpawn = 75; // frames entre enemigos
+    let enemigosNivel = 0;   // destruidos en el nivel actual
+    const META_NIVEL = 10;   // enemigos por nivel
+
+    /* ---- Input ---- */
+    const teclas = { izq: false, der: false, disparo: false };
+    let mouseX = null;
+
+    /* ---- Inicializar estrellas de fondo ---- */
+    function initEstrellas() {
+      estrellas = [];
+      for (let i = 0; i < 60; i++) {
+        estrellas.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 1.5 + 0.3,
+          vel: Math.random() * 0.6 + 0.2
+        });
+      }
+    }
+
+    /* ---- Reiniciar partida ---- */
+    function reiniciar() {
+      puntos = 0;
+      nivel = 1;
+      vidas = 3;
+      eliminados = 0;
+      enemigosNivel = 0;
+      intervaloSpawn = 75;
+      balas = [];
+      enemigos = [];
+      particulas = [];
+      nave.x = W / 2;
+      nave.cooldown = 0;
+      tiempoSpawn = 0;
+      actualizarHUD();
+    }
+
+    /* ---- HUD ---- */
+    function actualizarHUD() {
+      document.getElementById('hud-puntos').textContent = puntos;
+      document.getElementById('hud-nivel').textContent = nivel;
+      document.getElementById('hud-record').textContent = record;
+      document.getElementById('hud-vidas').textContent =
+        vidas > 0 ? '❤'.repeat(vidas) : '—';
+    }
+
+    /* ---- Spawn de enemigo ---- */
+    function spawnEnemigo() {
+      const tipo = TIPOS_ENEMIGO[Math.floor(Math.random() * TIPOS_ENEMIGO.length)];
+      const tam = 34;
+      enemigos.push({
+        x: Math.random() * (W - tam * 2) + tam,
+        y: -tam,
+        tam: tam,
+        tipo: tipo,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: 0.7 + nivel * 0.25 + Math.random() * 0.5,
+        balanceo: Math.random() * Math.PI * 2
+      });
+    }
+
+    /* ---- Disparar ---- */
+    function disparar() {
+      if (nave.cooldown > 0) return;
+      balas.push({ x: nave.x, y: nave.y - nave.alto / 2, vy: -9, r: 4 });
+      nave.cooldown = 14;
+    }
+
+    /* ---- Crear explosión de partículas ---- */
+    function explotar(x, y, color) {
+      for (let i = 0; i < 14; i++) {
+        const ang = (Math.PI * 2 * i) / 14;
+        const vel = Math.random() * 3 + 1;
+        particulas.push({
+          x: x, y: y,
+          vx: Math.cos(ang) * vel,
+          vy: Math.sin(ang) * vel,
+          vida: 1,
+          color: color,
+          r: Math.random() * 3 + 1
+        });
+      }
+    }
+
+    /* ---- Perder vida ---- */
+    function perderVida() {
+      vidas--;
+      explotar(nave.x, nave.y, '#FF4D6D');
+      actualizarHUD();
+      if (vidas <= 0) terminarJuego();
+    }
+
+    /* ---- Subir de nivel ---- */
+    function subirNivel() {
+      nivel++;
+      enemigosNivel = 0;
+      intervaloSpawn = Math.max(28, 75 - nivel * 6);
+      actualizarHUD();
+      /* Destello de nivel */
+      for (let i = 0; i < 30; i++) {
+        explotar(Math.random() * W, Math.random() * H * 0.6, '#00FF88');
+      }
+    }
+
+    /* ---- Terminar juego ---- */
+    function terminarJuego() {
+      estado = 'fin';
+      if (puntos > record) {
+        record = puntos;
+        localStorage.setItem('tecnodefensa-record', record);
+      }
+      document.getElementById('fin-puntos').textContent = puntos;
+      document.getElementById('fin-eliminados').textContent = eliminados;
+      document.getElementById('fin-nivel').textContent = nivel;
+
+      const finTitulo = document.getElementById('fin-titulo');
+      const finDesc = document.getElementById('fin-desc');
+      const finIcono = document.getElementById('fin-icono');
+      if (puntos >= 300) {
+        finIcono.textContent = '🏆';
+        finTitulo.textContent = '¡Defensor experto!';
+        finDesc.textContent = 'Mantuviste a raya las consecuencias negativas. Tu bienestar digital está protegido.';
+      } else if (puntos >= 120) {
+        finIcono.textContent = '🛡️';
+        finTitulo.textContent = '¡Buena defensa!';
+        finDesc.textContent = 'Eliminaste muchas amenazas. Con práctica llegarás aún más lejos.';
+      } else {
+        finIcono.textContent = '🛸';
+        finTitulo.textContent = 'Fin de la partida';
+        finDesc.textContent = 'Las consecuencias te alcanzaron. En la vida real, el equilibrio es la mejor defensa.';
+      }
+      actualizarHUD();
+      mostrarOverlay('overlay-fin');
+    }
+
+    /* ---- Overlays ---- */
+    function mostrarOverlay(id) {
+      ['overlay-inicio', 'overlay-pausa', 'overlay-fin'].forEach(o => {
+        document.getElementById(o).classList.add('oculto');
+      });
+      if (id) document.getElementById(id).classList.remove('oculto');
+    }
+
+    /* ---- Actualización lógica ---- */
+    function actualizar() {
+      /* Estrellas siempre se mueven (fondo) */
+      estrellas.forEach(s => {
+        s.y += s.vel;
+        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+      });
+
+      if (estado !== 'jugando') return;
+
+      /* Mover nave */
+      if (teclas.izq) nave.x -= nave.velocidad;
+      if (teclas.der) nave.x += nave.velocidad;
+      if (mouseX !== null) nave.x += (mouseX - nave.x) * 0.2;
+      nave.x = Math.max(nave.ancho / 2, Math.min(W - nave.ancho / 2, nave.x));
+
+      if (nave.cooldown > 0) nave.cooldown--;
+      if (teclas.disparo) disparar();
+
+      /* Spawn de enemigos */
+      tiempoSpawn++;
+      if (tiempoSpawn >= intervaloSpawn) {
+        tiempoSpawn = 0;
+        spawnEnemigo();
+      }
+
+      /* Mover balas */
+      balas.forEach(b => b.y += b.vy);
+      balas = balas.filter(b => b.y > -10);
+
+      /* Mover enemigos */
+      enemigos.forEach(e => {
+        e.balanceo += 0.05;
+        e.x += e.vx + Math.sin(e.balanceo) * 0.5;
+        e.y += e.vy;
+        /* Rebote lateral */
+        if (e.x < e.tam / 2 || e.x > W - e.tam / 2) e.vx *= -1;
+      });
+
+      /* Colisión bala-enemigo */
+      for (let i = enemigos.length - 1; i >= 0; i--) {
+        const e = enemigos[i];
+        for (let j = balas.length - 1; j >= 0; j--) {
+          const b = balas[j];
+          const dx = e.x - b.x;
+          const dy = e.y - b.y;
+          if (Math.sqrt(dx * dx + dy * dy) < e.tam / 2 + b.r) {
+            explotar(e.x, e.y, e.tipo.color);
+            puntos += e.tipo.puntos;
+            eliminados++;
+            enemigosNivel++;
+            enemigos.splice(i, 1);
+            balas.splice(j, 1);
+            actualizarHUD();
+            if (enemigosNivel >= META_NIVEL) subirNivel();
+            break;
+          }
+        }
+      }
+
+      /* Enemigo llega abajo o choca con la nave */
+      for (let i = enemigos.length - 1; i >= 0; i--) {
+        const e = enemigos[i];
+        const chocaNave =
+          Math.abs(e.x - nave.x) < e.tam / 2 + nave.ancho / 2 &&
+          Math.abs(e.y - nave.y) < e.tam / 2 + nave.alto / 2;
+        if (e.y > H + e.tam || chocaNave) {
+          explotar(e.x, e.y, e.tipo.color);
+          enemigos.splice(i, 1);
+          perderVida();
+        }
+      }
+
+      /* Partículas */
+      particulas.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        p.vida -= 0.03;
+      });
+      particulas = particulas.filter(p => p.vida > 0);
+    }
+
+    /* ---- Dibujado ---- */
+    function dibujar() {
+      ctx.clearRect(0, 0, W, H);
+
+      /* Estrellas */
+      ctx.save();
+      estrellas.forEach(s => {
+        ctx.globalAlpha = 0.4 + s.r / 3;
+        ctx.fillStyle = '#7FD4FF';
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+
+      /* Partículas */
+      particulas.forEach(p => {
+        ctx.globalAlpha = Math.max(0, p.vida);
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+
+      /* Balas */
+      balas.forEach(b => {
+        ctx.fillStyle = '#00FF88';
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#00FF88';
+        ctx.beginPath();
+        ctx.roundRect(b.x - b.r / 2, b.y - 9, b.r, 14, 3);
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      /* Enemigos */
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      enemigos.forEach(e => {
+        /* Halo de color */
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = e.tipo.color;
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = e.tipo.color;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.tam / 2 + 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+        /* Emoji */
+        ctx.font = `${e.tam}px serif`;
+        ctx.fillText(e.tipo.emoji, e.x, e.y + 1);
+      });
+
+      /* Nave del jugador */
+      if (estado === 'jugando' || estado === 'pausa') dibujarNave();
+    }
+
+    /* ---- Dibujar la nave (triángulo neón) ---- */
+    function dibujarNave() {
+      const { x, y, ancho, alto } = nave;
+      ctx.save();
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = '#00D4FF';
+
+      /* Cuerpo */
+      ctx.beginPath();
+      ctx.moveTo(x, y - alto / 2);
+      ctx.lineTo(x - ancho / 2, y + alto / 2);
+      ctx.lineTo(x - ancho / 5, y + alto / 4);
+      ctx.lineTo(x + ancho / 5, y + alto / 4);
+      ctx.lineTo(x + ancho / 2, y + alto / 2);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(x, y - alto / 2, x, y + alto / 2);
+      grad.addColorStop(0, '#00D4FF');
+      grad.addColorStop(1, '#0A6E8C');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      /* Borde brillante */
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#7FF0FF';
+      ctx.stroke();
+
+      /* Cabina */
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = '#A855F7';
+      ctx.fillStyle = '#A855F7';
+      ctx.beginPath();
+      ctx.arc(x, y - 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      /* Propulsor */
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = '#FFB800';
+      ctx.fillStyle = 'rgba(255,184,0,0.85)';
+      const llama = 6 + Math.random() * 7;
+      ctx.beginPath();
+      ctx.moveTo(x - ancho / 6, y + alto / 4);
+      ctx.lineTo(x, y + alto / 4 + llama);
+      ctx.lineTo(x + ancho / 6, y + alto / 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    /* ---- Bucle principal ---- */
+    function bucle() {
+      actualizar();
+      dibujar();
+      requestAnimationFrame(bucle);
+    }
+
+    /* ---- Iniciar partida ---- */
+    function comenzar() {
+      reiniciar();
+      estado = 'jugando';
+      mostrarOverlay(null);
+    }
+
+    /* ---- Pausa ---- */
+    function alternarPausa() {
+      if (estado === 'jugando') {
+        estado = 'pausa';
+        mostrarOverlay('overlay-pausa');
+      } else if (estado === 'pausa') {
+        estado = 'jugando';
+        mostrarOverlay(null);
+      }
+    }
+
+    /* ---- Eventos teclado ---- */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') teclas.izq = true;
+      if (e.key === 'ArrowRight' || e.key === 'd') teclas.der = true;
+      if (e.key === ' ') { teclas.disparo = true; e.preventDefault(); }
+      if (e.key === 'p' || e.key === 'P') alternarPausa();
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') teclas.izq = false;
+      if (e.key === 'ArrowRight' || e.key === 'd') teclas.der = false;
+      if (e.key === ' ') teclas.disparo = false;
+    });
+
+    /* ---- Eventos mouse/táctil sobre el canvas ---- */
+    function posicionRelativa(clientX) {
+      const rect = canvas.getBoundingClientRect();
+      return ((clientX - rect.left) / rect.width) * W;
+    }
+    canvas.addEventListener('mousemove', (e) => {
+      if (estado === 'jugando') mouseX = posicionRelativa(e.clientX);
+    });
+    canvas.addEventListener('mouseleave', () => { mouseX = null; });
+    canvas.addEventListener('mousedown', (e) => {
+      if (estado === 'jugando') { disparar(); e.preventDefault(); }
+    });
+    canvas.addEventListener('touchstart', (e) => {
+      if (estado === 'jugando') {
+        mouseX = posicionRelativa(e.touches[0].clientX);
+        disparar();
+        e.preventDefault();
+      }
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      if (estado === 'jugando') {
+        mouseX = posicionRelativa(e.touches[0].clientX);
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    /* ---- Controles móviles ---- */
+    const btnIzq = document.getElementById('btn-izq');
+    const btnDer = document.getElementById('btn-der');
+    const btnDisparo = document.getElementById('btn-disparo');
+    function bind(btn, prop) {
+      btn.addEventListener('touchstart', (e) => { teclas[prop] = true; e.preventDefault(); }, { passive: false });
+      btn.addEventListener('touchend',   (e) => { teclas[prop] = false; e.preventDefault(); }, { passive: false });
+      btn.addEventListener('mousedown', () => { teclas[prop] = true; });
+      btn.addEventListener('mouseup',   () => { teclas[prop] = false; });
+      btn.addEventListener('mouseleave',() => { teclas[prop] = false; });
+    }
+    bind(btnIzq, 'izq');
+    bind(btnDer, 'der');
+    bind(btnDisparo, 'disparo');
+
+    /* ---- Botones de overlay ---- */
+    document.getElementById('btn-jugar').addEventListener('click', comenzar);
+    document.getElementById('btn-reiniciar').addEventListener('click', comenzar);
+    document.getElementById('btn-reanudar').addEventListener('click', alternarPausa);
+
+    /* ---- Init ---- */
+    initEstrellas();
+    actualizarHUD();
+    bucle();
+  })();
+  </script>
+</body>
+</html>
