@@ -306,7 +306,8 @@
         <h2 class="overlay-titulo">¿Listo para defender?</h2>
         <p class="overlay-desc">
           Las consecuencias negativas de la tecnología descienden hacia ti.
-          Dispárales antes de que lleguen abajo. ¡Protege tu bienestar digital!
+          Dispárales antes de que lleguen abajo y recoge los <strong style="color:var(--color-verde)">orbes de hábitos saludables</strong> ✨
+          para activar poderes durante 13 segundos. ¡Protege tu bienestar digital!
         </p>
         <div class="controles-info">
           <span class="control-chip"><kbd>← →</kbd> Mover</span>
@@ -362,12 +363,23 @@
     </div>
 
     <!-- Leyenda de enemigos -->
+    <p class="seccion-etiqueta" style="margin:1.5rem 0 0.5rem; text-align:center;">Amenazas a destruir</p>
     <div class="leyenda-enemigos">
       <div class="leyenda-item"><span class="leyenda-emoji">😰</span> Ansiedad</div>
       <div class="leyenda-item"><span class="leyenda-emoji">😴</span> Insomnio</div>
       <div class="leyenda-item"><span class="leyenda-emoji">🛋️</span> Sedentarismo</div>
       <div class="leyenda-item"><span class="leyenda-emoji">👁️</span> Fatiga visual</div>
       <div class="leyenda-item"><span class="leyenda-emoji">📵</span> Aislamiento</div>
+    </div>
+
+    <!-- Leyenda de orbes de poder -->
+    <p class="seccion-etiqueta" style="margin:1.25rem 0 0.5rem; text-align:center; color:var(--color-verde);">Orbes de poder · 13 s</p>
+    <div class="leyenda-enemigos" style="border-color:rgba(0,255,136,.2);">
+      <div class="leyenda-item"><span class="leyenda-emoji">🛌</span> Descanso = escudo</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">🏃</span> Ejercicio = velocidad</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">🧘</span> Pausa = disparo triple</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">🤝</span> Conexión = puntos x2</div>
+      <div class="leyenda-item"><span class="leyenda-emoji">🌿</span> Aire libre = disparo veloz</div>
     </div>
   </div><!-- /nave-wrapper -->
 
@@ -407,6 +419,17 @@
       { emoji: '📵', nombre: 'Aislamiento',   color: '#00FF88', puntos: 20 }
     ];
 
+    /* ---- Orbes de poder (hábitos saludables) ---- */
+    const PODERES = [
+      { emoji: '🛌', nombre: 'Descanso reparador', clave: 'escudo',    color: '#00D4FF', desc: '¡Invulnerable!' },
+      { emoji: '🏃', nombre: 'Ejercicio',          clave: 'velocidad', color: '#00FF88', desc: 'Más velocidad' },
+      { emoji: '🧘', nombre: 'Pausa consciente',   clave: 'triple',    color: '#FFB800', desc: 'Disparo triple' },
+      { emoji: '🤝', nombre: 'Conexión real',      clave: 'puntos',    color: '#A855F7', desc: 'Puntos x2' },
+      { emoji: '🌿', nombre: 'Aire libre',         clave: 'rapido',    color: '#5EEAD4', desc: 'Disparo veloz' }
+    ];
+    const DURACION_PODER = 13000;   // milisegundos
+    const ORBE_CADA = 8;            // enemigos eliminados por cada orbe
+
     /* ---- Estado global ---- */
     let estado = 'inicio'; // inicio | jugando | pausa | fin
     let puntos = 0;
@@ -430,6 +453,9 @@
     let enemigos = [];
     let particulas = [];
     let estrellas = [];
+    let orbes = [];
+    let poderActivo = null;        // { ...poder, finMs }
+    let proximoOrbe = ORBE_CADA;   // umbral de eliminados para el próximo orbe
 
     /* ---- Control de oleadas ---- */
     let tiempoSpawn = 0;
@@ -465,6 +491,9 @@
       balas = [];
       enemigos = [];
       particulas = [];
+      orbes = [];
+      poderActivo = null;
+      proximoOrbe = ORBE_CADA;
       nave.x = W / 2;
       nave.cooldown = 0;
       tiempoSpawn = 0;
@@ -495,11 +524,41 @@
       });
     }
 
+    /* ---- Spawn de orbe de poder ---- */
+    function spawnOrbe() {
+      const poder = PODERES[Math.floor(Math.random() * PODERES.length)];
+      const tam = 32;
+      orbes.push({
+        x: Math.random() * (W - tam * 2) + tam,
+        y: -tam,
+        tam: tam,
+        poder: poder,
+        vy: 1.6,
+        giro: 0,
+        balanceo: Math.random() * Math.PI * 2
+      });
+    }
+
+    /* ---- Activar poder al recoger un orbe ---- */
+    function activarPoder(poder) {
+      poderActivo = Object.assign({}, poder, { finMs: performance.now() + DURACION_PODER });
+      /* Destello del color del poder */
+      for (let i = 0; i < 18; i++) explotar(nave.x, nave.y, poder.color);
+    }
+
     /* ---- Disparar ---- */
     function disparar() {
       if (nave.cooldown > 0) return;
-      balas.push({ x: nave.x, y: nave.y - nave.alto / 2, vy: -9, r: 4 });
-      nave.cooldown = 14;
+      const px = nave.x, py = nave.y - nave.alto / 2;
+      const clave = poderActivo ? poderActivo.clave : null;
+      if (clave === 'triple') {
+        balas.push({ x: px, y: py, vx: 0,    vy: -9,   r: 4 });
+        balas.push({ x: px, y: py, vx: -2.6, vy: -8.4, r: 4 });
+        balas.push({ x: px, y: py, vx: 2.6,  vy: -8.4, r: 4 });
+      } else {
+        balas.push({ x: px, y: py, vx: 0, vy: -9, r: 4 });
+      }
+      nave.cooldown = (clave === 'rapido') ? 6 : 14;
     }
 
     /* ---- Crear explosión de partículas ---- */
@@ -587,9 +646,17 @@
 
       if (estado !== 'jugando') return;
 
-      /* Mover nave */
-      if (teclas.izq) nave.x -= nave.velocidad;
-      if (teclas.der) nave.x += nave.velocidad;
+      /* Expirar poder activo */
+      if (poderActivo && performance.now() >= poderActivo.finMs) {
+        poderActivo = null;
+      }
+
+      /* Mover nave (más veloz con el poder de ejercicio) */
+      const vel = (poderActivo && poderActivo.clave === 'velocidad')
+        ? nave.velocidad * 1.6
+        : nave.velocidad;
+      if (teclas.izq) nave.x -= vel;
+      if (teclas.der) nave.x += vel;
       if (mouseX !== null) nave.x += (mouseX - nave.x) * 0.2;
       nave.x = Math.max(nave.ancho / 2, Math.min(W - nave.ancho / 2, nave.x));
 
@@ -604,8 +671,8 @@
       }
 
       /* Mover balas */
-      balas.forEach(b => b.y += b.vy);
-      balas = balas.filter(b => b.y > -10);
+      balas.forEach(b => { b.y += b.vy; b.x += (b.vx || 0); });
+      balas = balas.filter(b => b.y > -10 && b.x > -10 && b.x < W + 10);
 
       /* Mover enemigos */
       enemigos.forEach(e => {
@@ -625,7 +692,8 @@
           const dy = e.y - b.y;
           if (Math.sqrt(dx * dx + dy * dy) < e.tam / 2 + b.r) {
             explotar(e.x, e.y, e.tipo.color);
-            puntos += e.tipo.puntos;
+            const mult = (poderActivo && poderActivo.clave === 'puntos') ? 2 : 1;
+            puntos += e.tipo.puntos * mult;
             eliminados++;
             enemigosNivel++;
             enemigos.splice(i, 1);
@@ -638,16 +706,42 @@
       }
 
       /* Enemigo llega abajo o choca con la nave */
+      const escudo = poderActivo && poderActivo.clave === 'escudo';
       for (let i = enemigos.length - 1; i >= 0; i--) {
         const e = enemigos[i];
         const chocaNave =
           Math.abs(e.x - nave.x) < e.tam / 2 + nave.ancho / 2 &&
           Math.abs(e.y - nave.y) < e.tam / 2 + nave.alto / 2;
         if (e.y > H + e.tam || chocaNave) {
-          explotar(e.x, e.y, e.tipo.color);
+          /* Con el escudo de descanso, el enemigo se destruye sin penalización */
+          explotar(e.x, e.y, escudo ? '#00D4FF' : e.tipo.color);
           enemigos.splice(i, 1);
-          perderVida();
+          if (!escudo) perderVida();
         }
+      }
+
+      /* Generar un orbe de poder cada cierto número de eliminados */
+      if (eliminados >= proximoOrbe) {
+        proximoOrbe += ORBE_CADA;
+        spawnOrbe();
+      }
+
+      /* Mover orbes y detectar recolección con la nave */
+      for (let i = orbes.length - 1; i >= 0; i--) {
+        const o = orbes[i];
+        o.y += o.vy;
+        o.giro += 0.05;
+        o.balanceo += 0.04;
+        o.x += Math.sin(o.balanceo) * 0.7;
+
+        const dx = o.x - nave.x;
+        const dy = o.y - nave.y;
+        if (Math.sqrt(dx * dx + dy * dy) < o.tam / 2 + nave.ancho / 2) {
+          activarPoder(o.poder);
+          orbes.splice(i, 1);
+          continue;
+        }
+        if (o.y > H + o.tam) orbes.splice(i, 1);
       }
 
       /* Partículas */
@@ -719,8 +813,89 @@
         ctx.fillText(e.tipo.emoji, e.x, e.y + 1);
       });
 
+      /* Orbes de poder */
+      orbes.forEach(o => {
+        const pulso = 1 + Math.sin(o.balanceo * 2) * 0.08;
+        const r = (o.tam / 2) * pulso;
+        /* Halo */
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = o.poder.color;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = o.poder.color;
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, r + 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        /* Núcleo oscuro */
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(4,7,14,0.85)';
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        /* Anillo giratorio */
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = o.poder.color;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = o.poder.color;
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, r, o.giro, o.giro + Math.PI * 1.4);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        /* Emoji del hábito */
+        ctx.font = `${o.tam * 0.65}px serif`;
+        ctx.fillText(o.poder.emoji, o.x, o.y + 1);
+      });
+
       /* Nave del jugador */
       if (estado === 'jugando' || estado === 'pausa') dibujarNave();
+
+      /* Banner del poder activo */
+      if (poderActivo && estado === 'jugando') dibujarBannerPoder();
+    }
+
+    /* ---- Banner del poder activo ---- */
+    function dibujarBannerPoder() {
+      const restante = Math.max(0, poderActivo.finMs - performance.now());
+      const frac = restante / DURACION_PODER;
+      const segs = Math.ceil(restante / 1000);
+      const bw = 230, bh = 30, bx = W / 2 - bw / 2, by = 12;
+
+      ctx.save();
+      /* Fondo */
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = 'rgba(4,7,14,0.7)';
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, 8);
+      ctx.fill();
+      /* Relleno de tiempo restante */
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = poderActivo.color;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw * frac, bh, 8);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      /* Borde */
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = poderActivo.color;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = poderActivo.color;
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bw, bh, 8);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      /* Texto */
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#E8F4FF';
+      ctx.font = '600 12px "Exo 2", sans-serif';
+      ctx.fillText(`${poderActivo.emoji} ${poderActivo.nombre}`, bx + 12, by + bh / 2 + 1);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = poderActivo.color;
+      ctx.font = '700 13px "Orbitron", monospace';
+      ctx.fillText(`${segs}s`, bx + bw - 12, by + bh / 2 + 1);
+      ctx.restore();
+      /* Restaurar alineación usada por enemigos/orbes */
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
     }
 
     /* ---- Dibujar la nave (triángulo neón) ---- */
