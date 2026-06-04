@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TecnoTrivia — TecnoImpacto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ---- Juego: layout principal ---- */
+    .juego-hero {
+      min-height: 40vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 1.5rem 4rem;
+    }
+
+    /* ---- Pantalla de inicio ---- */
+    .pantalla {
+      display: none;
+      animation: fade-arriba 0.5s ease both;
+    }
+    .pantalla.activa { display: block; }
+
+    #juego-wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 1.5rem 6rem;
+    }
+
+    .intro-card {
+      background: var(--bg-tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-grande);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .intro-icono {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 20px var(--color-cian));
+      animation: flotar 3s ease-in-out infinite;
+    }
+    .intro-titulo {
+      font-family: var(--fuente-titulo);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900;
+      color: var(--color-cian);
+      text-shadow: 0 0 20px rgba(0,212,255,.5);
+      margin-bottom: 1rem;
+    }
+    .intro-desc {
+      color: var(--texto-secundario);
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .intro-reglas {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .regla-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,212,255,.08);
+      border: 1px solid rgba(0,212,255,.2);
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
+      color: var(--color-cian);
+      font-family: var(--fuente-titulo);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ---- Progreso ---- */
+    .juego-progreso {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+    .progreso-label {
+      font-family: var(--fuente-titulo);
+      font-size: 0.75rem;
+      color: var(--color-cian);
+      white-space: nowrap;
+    }
+    .progreso-barra-fondo {
+      flex: 1;
+      height: 6px;
+      background: rgba(0,212,255,.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progreso-barra-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-cian), var(--color-purpura));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 8px rgba(0,212,255,.5);
+    }
+    .puntaje-actual {
+      font-family: var(--fuente-titulo);
+      font-size: 0.75rem;
+      color: var(--color-verde);
+      white-space: nowrap;
+    }
+
+    /* ---- Tarjeta de pregunta ---- */
+    .pregunta-card {
+      background: var(--bg-tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-grande);
+      padding: 2.5rem 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    /* ---- Timer ---- */
+    .timer-fila {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+    .timer-numero {
+      font-family: var(--fuente-titulo);
+      font-size: 1.3rem;
+      font-weight: 900;
+      min-width: 2.5ch;
+      color: var(--color-ambar);
+      text-shadow: 0 0 12px rgba(255,184,0,.6);
+      transition: color 0.3s;
+    }
+    .timer-numero.urgente {
+      color: var(--color-rojo);
+      text-shadow: 0 0 12px rgba(255,77,109,.7);
+      animation: parpadeo 0.6s ease infinite;
+    }
+    .timer-barra-fondo {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,184,0,.15);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .timer-barra-relleno {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-verde), var(--color-ambar));
+      border-radius: 999px;
+      transition: width 1s linear, background 0.5s;
+      box-shadow: 0 0 8px rgba(255,184,0,.4);
+    }
+    .timer-barra-relleno.urgente {
+      background: linear-gradient(90deg, var(--color-rojo), var(--color-ambar));
+    }
+
+    .pregunta-texto {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      font-weight: 500;
+      color: var(--texto-primario);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    /* ---- Opciones de respuesta ---- */
+    .opciones-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+    @media (max-width: 520px) {
+      .opciones-grid { grid-template-columns: 1fr; }
+    }
+
+    .opcion-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 1rem 1.2rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radio);
+      color: var(--texto-primario);
+      font-family: var(--fuente-cuerpo);
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      line-height: 1.4;
+    }
+    .opcion-btn:hover:not(:disabled) {
+      background: rgba(0,212,255,.08);
+      border-color: rgba(0,212,255,.35);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,212,255,.12);
+    }
+    .opcion-letra {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      background: rgba(0,212,255,.1);
+      border: 1px solid rgba(0,212,255,.25);
+      border-radius: 6px;
+      font-family: var(--fuente-titulo);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--color-cian);
+      flex-shrink: 0;
+    }
+    .opcion-btn.correcta {
+      background: rgba(0,255,136,.12);
+      border-color: var(--color-verde);
+      box-shadow: 0 0 20px rgba(0,255,136,.2);
+    }
+    .opcion-btn.correcta .opcion-letra {
+      background: rgba(0,255,136,.2);
+      border-color: var(--color-verde);
+      color: var(--color-verde);
+    }
+    .opcion-btn.incorrecta {
+      background: rgba(255,77,109,.1);
+      border-color: var(--color-rojo);
+    }
+    .opcion-btn.incorrecta .opcion-letra {
+      background: rgba(255,77,109,.2);
+      border-color: var(--color-rojo);
+      color: var(--color-rojo);
+    }
+    .opcion-btn:disabled { cursor: default; }
+
+    /* ---- Panel de feedback ---- */
+    .feedback-panel {
+      background: rgba(0,0,0,.3);
+      border-radius: var(--radio);
+      padding: 1.2rem 1.5rem;
+      margin-top: 1rem;
+      display: none;
+      animation: fade-arriba 0.3s ease;
+    }
+    .feedback-panel.visible { display: flex; align-items: flex-start; gap: 0.75rem; }
+    .feedback-icono { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .feedback-texto strong {
+      display: block;
+      font-family: var(--fuente-titulo);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+    .feedback-texto p { font-size: 0.9rem; color: var(--texto-secundario); line-height: 1.5; }
+    .feedback-panel.correcto { border: 1px solid rgba(0,255,136,.3); }
+    .feedback-panel.correcto .feedback-texto strong { color: var(--color-verde); }
+    .feedback-panel.incorrecto { border: 1px solid rgba(255,77,109,.3); }
+    .feedback-panel.incorrecto .feedback-texto strong { color: var(--color-rojo); }
+    .feedback-panel.tiempo { border: 1px solid rgba(255,184,0,.3); }
+    .feedback-panel.tiempo .feedback-texto strong { color: var(--color-ambar); }
+
+    /* ---- Botón siguiente ---- */
+    .btn-siguiente {
+      display: none;
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(168,85,247,.15));
+      border: 1px solid rgba(0,212,255,.35);
+      border-radius: var(--radio);
+      color: var(--color-cian);
+      font-family: var(--fuente-titulo);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.25s, box-shadow 0.25s, transform 0.15s;
+    }
+    .btn-siguiente.visible { display: block; }
+    .btn-siguiente:hover {
+      background: linear-gradient(135deg, rgba(0,212,255,.25), rgba(168,85,247,.25));
+      box-shadow: 0 0 25px rgba(0,212,255,.25);
+      transform: translateY(-2px);
+    }
+
+    /* ---- Pantalla de resultados ---- */
+    .resultado-card {
+      background: var(--bg-tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-grande);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .resultado-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(168,85,247,.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .resultado-trofeo {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 1rem;
+      animation: flotar 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(255,184,0,.5));
+    }
+    .resultado-nivel {
+      font-family: var(--fuente-titulo);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--color-ambar);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .resultado-titulo {
+      font-family: var(--fuente-titulo);
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 900;
+      margin-bottom: 0.75rem;
+    }
+    .resultado-desc {
+      color: var(--texto-secundario);
+      max-width: 460px;
+      margin: 0 auto 2rem;
+      font-size: 0.95rem;
+    }
+    .resultado-puntaje {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 1.2rem 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .puntaje-num {
+      font-family: var(--fuente-titulo);
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .puntaje-total {
+      font-family: var(--fuente-titulo);
+      font-size: 1.2rem;
+      color: var(--texto-secundario);
+    }
+    .resultado-desglose {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .desglose-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-family: var(--fuente-titulo);
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+    }
+    .chip-correctas {
+      background: rgba(0,255,136,.1);
+      border: 1px solid rgba(0,255,136,.3);
+      color: var(--color-verde);
+    }
+    .chip-incorrectas {
+      background: rgba(255,77,109,.1);
+      border: 1px solid rgba(255,77,109,.3);
+      color: var(--color-rojo);
+    }
+    .chip-tiempo {
+      background: rgba(255,184,0,.1);
+      border: 1px solid rgba(255,184,0,.3);
+      color: var(--color-ambar);
+    }
+    .resultado-acciones {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ---- Medidor circular de score ---- */
+    .score-ring {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 2rem;
+    }
+    .score-ring svg { transform: rotate(-90deg); }
+    .ring-fondo { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 8; }
+    .ring-progreso {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 339;
+      stroke-dashoffset: 339;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .score-ring-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fuente-titulo);
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    /* ---- Partícula confetti en resultados ---- */
+    @keyframes confetti-caer {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120px) rotate(360deg); opacity: 0; }
+    }
+    .confetti-pieza {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confetti-caer 1.4s ease forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navegación -->
+  <nav class="nav-principal">
+    <div class="nav-interior">
+      <a href="index.html" class="nav-logo">TecnoImpacto</a>
+      <ul class="nav-enlaces">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+        <li><a href="juego.html" class="nav-juego-link">🎮 Juego</a></li>
+      </ul>
+      <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero del juego -->
+  <header class="juego-hero">
+    <p class="seccion-etiqueta" style="margin-bottom:1rem;">Modo interactivo</p>
+    <h1 style="font-family:var(--fuente-titulo); font-size:clamp(2rem,5vw,3.2rem); font-weight:900; text-align:center; margin-bottom:0.5rem;">
+      <span class="texto-cian">TecnoTrivia</span>
+    </h1>
+    <p style="color:var(--texto-secundario); text-align:center;">Pon a prueba lo que sabes sobre el impacto tecnológico</p>
+  </header>
+
+  <!-- Área del juego -->
+  <div id="juego-wrapper">
+
+    <!-- Pantalla: Inicio -->
+    <div id="pantalla-inicio" class="pantalla activa">
+      <div class="intro-card">
+        <span class="intro-icono">🧠</span>
+        <h2 class="intro-titulo">¿Cuánto sabes?</h2>
+        <p class="intro-desc">
+          10 preguntas sobre las consecuencias del uso de la tecnología en salud,
+          sociedad y medio ambiente. ¿Estás listo para el desafío?
+        </p>
+        <div class="intro-reglas">
+          <span class="regla-chip">⏱ 15 seg por pregunta</span>
+          <span class="regla-chip">✦ 10 preguntas</span>
+          <span class="regla-chip">⚡ Puntos por velocidad</span>
+        </div>
+        <button class="btn btn-primario" id="btn-iniciar" style="margin:0 auto;">
+          <span>🚀</span> Iniciar juego
+        </button>
+      </div>
+    </div>
+
+    <!-- Pantalla: Juego -->
+    <div id="pantalla-juego" class="pantalla">
+      <!-- Barra de progreso del juego -->
+      <div class="juego-progreso">
+        <span class="progreso-label" id="label-pregunta">Pregunta 1 / 10</span>
+        <div class="progreso-barra-fondo">
+          <div class="progreso-barra-relleno" id="barra-progreso" style="width:0%"></div>
+        </div>
+        <span class="puntaje-actual" id="label-puntaje">⚡ 0 pts</span>
+      </div>
+
+      <!-- Tarjeta de pregunta -->
+      <div class="pregunta-card">
+        <!-- Timer -->
+        <div class="timer-fila">
+          <span class="timer-numero" id="timer-num">15</span>
+          <div class="timer-barra-fondo">
+            <div class="timer-barra-relleno" id="timer-barra" style="width:100%"></div>
+          </div>
+        </div>
+        <!-- Texto -->
+        <p class="pregunta-texto" id="pregunta-texto">Cargando…</p>
+      </div>
+
+      <!-- Opciones -->
+      <div class="opciones-grid" id="opciones-contenedor"></div>
+
+      <!-- Feedback -->
+      <div class="feedback-panel" id="feedback-panel">
+        <span class="feedback-icono" id="feedback-icono">✅</span>
+        <div class="feedback-texto">
+          <strong id="feedback-titulo">¡Correcto!</strong>
+          <p id="feedback-desc">Explicación aquí.</p>
+        </div>
+      </div>
+
+      <!-- Botón siguiente -->
+      <button class="btn-siguiente" id="btn-siguiente">
+        SIGUIENTE PREGUNTA →
+      </button>
+    </div>
+
+    <!-- Pantalla: Resultados -->
+    <div id="pantalla-resultados" class="pantalla">
+      <div class="resultado-card" id="resultado-card">
+        <!-- Confetti se inyecta aquí con JS -->
+        <span class="resultado-trofeo" id="resultado-trofeo">🏆</span>
+        <p class="resultado-nivel" id="resultado-nivel">EXPERTO DIGITAL</p>
+        <h2 class="resultado-titulo" id="resultado-titulo">¡Excelente!</h2>
+        <p class="resultado-desc" id="resultado-desc">Descripción del resultado</p>
+
+        <!-- Medidor circular -->
+        <div class="score-ring">
+          <svg viewBox="0 0 120 120" width="130" height="130">
+            <circle class="ring-fondo" cx="60" cy="60" r="54" />
+            <circle class="ring-progreso" id="ring-progreso" cx="60" cy="60" r="54" />
+          </svg>
+          <div class="score-ring-num" id="score-ring-num" style="color:var(--color-cian)">0%</div>
+        </div>
+
+        <!-- Puntaje -->
+        <div class="resultado-puntaje">
+          <span class="puntaje-num" id="puntaje-final" style="color:var(--color-cian)">0</span>
+          <span class="puntaje-total">/ 1000 pts</span>
+        </div>
+
+        <!-- Desglose -->
+        <div class="resultado-desglose">
+          <span class="desglose-chip chip-correctas" id="chip-correctas">✅ 0 correctas</span>
+          <span class="desglose-chip chip-incorrectas" id="chip-incorrectas">❌ 0 incorrectas</span>
+          <span class="desglose-chip chip-tiempo" id="chip-tiempo">⏱ 0 por tiempo</span>
+        </div>
+
+        <!-- Acciones -->
+        <div class="resultado-acciones">
+          <button class="btn btn-primario" id="btn-reiniciar">
+            <span>🔄</span> Jugar de nuevo
+          </button>
+          <a href="soluciones.html" class="btn btn-secundario">
+            <span>✦</span> Ver soluciones
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /juego-wrapper -->
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="index.html" class="footer-logo">TecnoImpacto</a>
+      <ul class="footer-nav">
+        <li><a href="salud-fisica.html">Salud física</a></li>
+        <li><a href="salud-mental.html">Salud mental</a></li>
+        <li><a href="sociedad.html">Sociedad</a></li>
+        <li><a href="ambiente.html">Ambiente</a></li>
+        <li><a href="soluciones.html">Soluciones</a></li>
+        <li><a href="juego.html">Juego</a></li>
+      </ul>
+      <p>Proyecto escolar · Equipo web · 2026 · Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    /* ---- Banco de preguntas ---- */
+    const PREGUNTAS = [
+      {
+        texto: '¿Cuántas horas en promedio pasan los adultos frente a pantallas al día?',
+        opciones: ['3 horas', '5 horas', '7 horas', '10 horas'],
+        correcta: 2,
+        explicacion: 'Según estudios recientes, los adultos pasan un promedio de 7 horas diarias frente a pantallas, sumando trabajo, entretenimiento y redes sociales.',
+        fuente: 'DataReportal 2023'
+      },
+      {
+        texto: '¿Qué porcentaje de jóvenes reporta ansiedad relacionada con el uso digital?',
+        opciones: ['22%', '38%', '58%', '75%'],
+        correcta: 2,
+        explicacion: 'El 58% de los jóvenes reporta niveles de ansiedad relacionados con el uso excesivo de dispositivos y redes sociales.',
+        fuente: 'APA Report 2023'
+      },
+      {
+        texto: '¿Cómo se conoce popularmente el dolor de cuello por inclinarse sobre el teléfono?',
+        opciones: ['Síndrome del túnel carpiano', 'Cuello tecnológico', 'Fatiga de pantalla', 'Síndrome digital'],
+        correcta: 1,
+        explicacion: 'El "cuello tecnológico" o "tech neck" es causado por la postura de inclinación frecuente al usar teléfonos. Puede generar hasta 27 kg de presión adicional en la cervical.',
+        fuente: 'Surgical Technology International, 2014'
+      },
+      {
+        texto: '¿Cuántos usuarios activos en redes sociales hay en el mundo aproximadamente?',
+        opciones: ['1.2 mil millones', '2.5 mil millones', '3.7 mil millones', '4.9 mil millones'],
+        correcta: 3,
+        explicacion: 'Actualmente hay aproximadamente 4.9 mil millones de usuarios activos en redes sociales a nivel mundial, más del 60% de la población total.',
+        fuente: 'DataReportal 2023'
+      },
+      {
+        texto: '¿Qué neurotransmisor libera el cerebro al recibir notificaciones en el teléfono?',
+        opciones: ['Serotonina', 'Dopamina', 'Endorfina', 'Adrenalina'],
+        correcta: 1,
+        explicacion: 'El cerebro libera dopamina con cada notificación, generando un ciclo de recompensa similar al de las apuestas. Esto es lo que crea la adicción al teléfono.',
+        fuente: 'Neuroscience & Biobehavioral Reviews, 2021'
+      },
+      {
+        texto: '¿Cuánto ha aumentado la emisión de CO₂ del sector tecnológico en los últimos años?',
+        opciones: ['+15%', '+25%', '+40%', '+60%'],
+        correcta: 2,
+        explicacion: 'Las emisiones de CO₂ del sector tecnológico han aumentado más del 40%, impulsadas por centros de datos, fabricación de dispositivos y el crecimiento de la IA.',
+        fuente: 'IEA 2023'
+      },
+      {
+        texto: '¿Cuántas millones de toneladas de basura electrónica se generan en el mundo al año?',
+        opciones: ['20 millones', '35 millones', '50 millones', '80 millones'],
+        correcta: 2,
+        explicacion: 'Se generan aproximadamente 50 millones de toneladas de e-waste al año. Es el tipo de residuo de más rápido crecimiento y solo se recicla el 20% correctamente.',
+        fuente: 'Global E-waste Monitor 2020'
+      },
+      {
+        texto: '¿Qué tipo de luz emiten las pantallas que más afecta el ciclo de sueño?',
+        opciones: ['Luz infrarroja', 'Luz ultravioleta', 'Luz azul', 'Luz verde'],
+        correcta: 2,
+        explicacion: 'La luz azul de las pantallas suprime la producción de melatonina, la hormona que regula el sueño. Esto puede retrasar el inicio del sueño hasta 2 horas.',
+        fuente: 'Harvard Health, 2020'
+      },
+      {
+        texto: '¿Cuántos minutos antes de dormir recomiendan los expertos dejar de usar pantallas?',
+        opciones: ['15 minutos', '30 minutos', '60 minutos', '120 minutos'],
+        correcta: 2,
+        explicacion: 'Los expertos recomiendan evitar pantallas al menos 60 minutos antes de dormir para permitir que el cuerpo produzca melatonina y prepare el ciclo de sueño.',
+        fuente: 'Sleep Foundation, 2022'
+      },
+      {
+        texto: '¿En qué consiste la regla 20-20-20 para proteger la vista al usar pantallas?',
+        opciones: [
+          'Cada 20 min, mirar a 6 metros por 20 segundos',
+          'Usar pantallas máximo 20 horas a la semana',
+          'Descansar 20 minutos cada 20 horas de uso',
+          'Ver a 20 cm por 20 segundos cada 20 minutos'
+        ],
+        correcta: 0,
+        explicacion: 'La regla 20-20-20 indica que cada 20 minutos de pantalla, debes mirar algo a unos 6 metros de distancia por al menos 20 segundos para reducir la fatiga visual.',
+        fuente: 'American Academy of Ophthalmology'
+      }
+    ];
+
+    /* ---- Estado del juego ---- */
+    const TIEMPO_POR_PREGUNTA = 15;
+    const PUNTOS_BASE = 100;
+
+    let estado = {
+      preguntas: [],
+      indice: 0,
+      puntaje: 0,
+      correctas: 0,
+      incorrectas: 0,
+      sinTiempo: 0,
+      temporizador: null,
+      tiempoRestante: TIEMPO_POR_PREGUNTA,
+      respondida: false
+    };
+
+    /* ---- Referencias DOM ---- */
+    const $inicio    = document.getElementById('pantalla-inicio');
+    const $juego     = document.getElementById('pantalla-juego');
+    const $resultados = document.getElementById('pantalla-resultados');
+    const $btnIniciar  = document.getElementById('btn-iniciar');
+    const $btnSig     = document.getElementById('btn-siguiente');
+    const $btnReinit  = document.getElementById('btn-reiniciar');
+
+    const $labelPregunta = document.getElementById('label-pregunta');
+    const $labelPuntaje  = document.getElementById('label-puntaje');
+    const $barraProgreso = document.getElementById('barra-progreso');
+    const $preguntaTexto = document.getElementById('pregunta-texto');
+    const $opcionesContenedor = document.getElementById('opciones-contenedor');
+    const $feedbackPanel = document.getElementById('feedback-panel');
+    const $feedbackIcono = document.getElementById('feedback-icono');
+    const $feedbackTitulo = document.getElementById('feedback-titulo');
+    const $feedbackDesc  = document.getElementById('feedback-desc');
+    const $timerNum   = document.getElementById('timer-num');
+    const $timerBarra = document.getElementById('timer-barra');
+
+    /* ---- Pantallas ---- */
+    function mostrarPantalla(id) {
+      [$inicio, $juego, $resultados].forEach(p => p.classList.remove('activa'));
+      document.getElementById(id).classList.add('activa');
+    }
+
+    /* ---- Mezclar array (Fisher-Yates) ---- */
+    function mezclar(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ---- Iniciar juego ---- */
+    function iniciarJuego() {
+      estado.preguntas = mezclar(PREGUNTAS);
+      estado.indice = 0;
+      estado.puntaje = 0;
+      estado.correctas = 0;
+      estado.incorrectas = 0;
+      estado.sinTiempo = 0;
+      mostrarPantalla('pantalla-juego');
+      cargarPregunta();
+    }
+
+    /* ---- Cargar pregunta ---- */
+    function cargarPregunta() {
+      const pregunta = estado.preguntas[estado.indice];
+      estado.respondida = false;
+
+      $labelPregunta.textContent = `Pregunta ${estado.indice + 1} / ${estado.preguntas.length}`;
+      $labelPuntaje.textContent  = `⚡ ${estado.puntaje} pts`;
+      $barraProgreso.style.width = `${(estado.indice / estado.preguntas.length) * 100}%`;
+      $preguntaTexto.textContent = pregunta.texto;
+
+      /* Limpiar opciones */
+      $opcionesContenedor.innerHTML = '';
+      const letras = ['A', 'B', 'C', 'D'];
+      pregunta.opciones.forEach((opcion, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opcion-btn';
+        btn.innerHTML = `<span class="opcion-letra">${letras[i]}</span> ${opcion}`;
+        btn.addEventListener('click', () => responder(i));
+        $opcionesContenedor.appendChild(btn);
+      });
+
+      /* Feedback oculto */
+      $feedbackPanel.className = 'feedback-panel';
+      $btnSig.className = 'btn-siguiente';
+
+      /* Timer */
+      iniciarTimer();
+    }
+
+    /* ---- Timer ---- */
+    function iniciarTimer() {
+      clearInterval(estado.temporizador);
+      estado.tiempoRestante = TIEMPO_POR_PREGUNTA;
+      $timerNum.textContent = estado.tiempoRestante;
+      $timerBarra.style.width = '100%';
+      $timerNum.classList.remove('urgente');
+      $timerBarra.classList.remove('urgente');
+
+      estado.temporizador = setInterval(() => {
+        estado.tiempoRestante--;
+        $timerNum.textContent = estado.tiempoRestante;
+        $timerBarra.style.width = `${(estado.tiempoRestante / TIEMPO_POR_PREGUNTA) * 100}%`;
+
+        if (estado.tiempoRestante <= 5) {
+          $timerNum.classList.add('urgente');
+          $timerBarra.classList.add('urgente');
+        }
+        if (estado.tiempoRestante <= 0) {
+          clearInterval(estado.temporizador);
+          sinTiempo();
+        }
+      }, 1000);
+    }
+
+    /* ---- Sin tiempo ---- */
+    function sinTiempo() {
+      if (estado.respondida) return;
+      estado.respondida = true;
+      estado.sinTiempo++;
+
+      const pregunta = estado.preguntas[estado.indice];
+      const botones = $opcionesContenedor.querySelectorAll('.opcion-btn');
+      botones.forEach(btn => btn.disabled = true);
+      botones[pregunta.correcta].classList.add('correcta');
+
+      mostrarFeedback('tiempo', '⏰', '¡Se acabó el tiempo!', pregunta.explicacion);
+    }
+
+    /* ---- Responder ---- */
+    function responder(indiceOpcion) {
+      if (estado.respondida) return;
+      estado.respondida = true;
+      clearInterval(estado.temporizador);
+
+      const pregunta = estado.preguntas[estado.indice];
+      const botones  = $opcionesContenedor.querySelectorAll('.opcion-btn');
+      botones.forEach(btn => btn.disabled = true);
+
+      if (indiceOpcion === pregunta.correcta) {
+        /* Puntos extras por velocidad */
+        const bonus = Math.floor((estado.tiempoRestante / TIEMPO_POR_PREGUNTA) * 50);
+        const puntos = PUNTOS_BASE + bonus;
+        estado.puntaje += puntos;
+        estado.correctas++;
+        botones[indiceOpcion].classList.add('correcta');
+        mostrarFeedback('correcto', '✅', `¡Correcto! +${puntos} pts`, pregunta.explicacion);
+      } else {
+        estado.incorrectas++;
+        botones[indiceOpcion].classList.add('incorrecta');
+        botones[pregunta.correcta].classList.add('correcta');
+        mostrarFeedback('incorrecto', '❌', 'Respuesta incorrecta', pregunta.explicacion);
+      }
+    }
+
+    /* ---- Mostrar feedback ---- */
+    function mostrarFeedback(tipo, icono, titulo, desc) {
+      $feedbackPanel.className = `feedback-panel visible ${tipo}`;
+      $feedbackIcono.textContent = icono;
+      $feedbackTitulo.textContent = titulo;
+      $feedbackDesc.textContent = desc;
+      $btnSig.className = 'btn-siguiente visible';
+
+      const esUltima = estado.indice >= estado.preguntas.length - 1;
+      $btnSig.textContent = esUltima ? 'VER RESULTADOS →' : 'SIGUIENTE PREGUNTA →';
+    }
+
+    /* ---- Siguiente pregunta ---- */
+    $btnSig.addEventListener('click', () => {
+      estado.indice++;
+      if (estado.indice >= estado.preguntas.length) {
+        mostrarResultados();
+      } else {
+        cargarPregunta();
+      }
+    });
+
+    /* ---- Mostrar resultados ---- */
+    function mostrarResultados() {
+      mostrarPantalla('pantalla-resultados');
+      $barraProgreso.style.width = '100%';
+
+      const porcentaje = Math.round((estado.correctas / estado.preguntas.length) * 100);
+      const niveles = [
+        { min: 90, trofeo: '🏆', nivel: 'EXPERTO DIGITAL', titulo: '¡Increíble dominio!', color: '#FFB800',
+          desc: 'Tu conocimiento sobre el impacto tecnológico es sobresaliente. Eres parte de la solución.' },
+        { min: 70, trofeo: '🥈', nivel: 'CONSCIENTE DIGITAL', titulo: '¡Muy bien hecho!', color: '#00D4FF',
+          desc: 'Conoces bien los riesgos del uso de la tecnología. Sigue aprendiendo para llegar al 100%.' },
+        { min: 50, trofeo: '🥉', nivel: 'APRENDIZ DIGITAL', titulo: 'Buen comienzo', color: '#A855F7',
+          desc: 'Tienes bases sólidas. Explora las secciones del sitio para reforzar tu conocimiento.' },
+        { min: 0, trofeo: '📱', nivel: 'INICIANDO', titulo: '¡Sigue aprendiendo!', color: '#FF4D6D',
+          desc: 'Todos comenzamos en algún punto. Recorre las secciones del sitio para aprender más.' }
+      ];
+
+      const nivel = niveles.find(n => porcentaje >= n.min);
+
+      document.getElementById('resultado-trofeo').textContent = nivel.trofeo;
+      document.getElementById('resultado-nivel').textContent  = nivel.nivel;
+      document.getElementById('resultado-nivel').style.color  = nivel.color;
+      document.getElementById('resultado-titulo').textContent = nivel.titulo;
+      document.getElementById('resultado-titulo').style.color = nivel.color;
+      document.getElementById('resultado-desc').textContent   = nivel.desc;
+      document.getElementById('chip-correctas').textContent   = `✅ ${estado.correctas} correctas`;
+      document.getElementById('chip-incorrectas').textContent = `❌ ${estado.incorrectas} incorrectas`;
+      document.getElementById('chip-tiempo').textContent      = `⏱ ${estado.sinTiempo} por tiempo`;
+
+      /* Animar anillo */
+      const ring = document.getElementById('ring-progreso');
+      const circumference = 2 * Math.PI * 54;
+      ring.style.strokeDasharray  = circumference;
+      ring.style.strokeDashoffset = circumference;
+      ring.style.stroke = nivel.color;
+      ring.style.filter = `drop-shadow(0 0 8px ${nivel.color})`;
+      const ringNum = document.getElementById('score-ring-num');
+      ringNum.style.color = nivel.color;
+
+      setTimeout(() => {
+        ring.style.strokeDashoffset = circumference - (porcentaje / 100) * circumference;
+      }, 100);
+
+      /* Animar puntaje */
+      const $puntajeFinal = document.getElementById('puntaje-final');
+      $puntajeFinal.style.color = nivel.color;
+      $puntajeFinal.style.textShadow = `0 0 20px ${nivel.color}80`;
+      let puntoActual = 0;
+      const paso = Math.ceil(estado.puntaje / 60);
+      const anim = setInterval(() => {
+        puntoActual = Math.min(puntoActual + paso, estado.puntaje);
+        $puntajeFinal.textContent = puntoActual;
+        if (puntoActual >= estado.puntaje) clearInterval(anim);
+      }, 20);
+
+      /* Animar porcentaje en anillo */
+      let pctActual = 0;
+      const animPct = setInterval(() => {
+        pctActual = Math.min(pctActual + 2, porcentaje);
+        ringNum.textContent = pctActual + '%';
+        if (pctActual >= porcentaje) clearInterval(animPct);
+      }, 25);
+
+      /* Confetti si puntaje > 50% */
+      if (porcentaje >= 50) lanzarConfetti(nivel.color);
+    }
+
+    /* ---- Confetti ---- */
+    function lanzarConfetti(color) {
+      const card = document.getElementById('resultado-card');
+      const colores = [color, '#00D4FF', '#A855F7', '#FFB800', '#00FF88'];
+      for (let i = 0; i < 28; i++) {
+        setTimeout(() => {
+          const pieza = document.createElement('div');
+          pieza.className = 'confetti-pieza';
+          pieza.style.cssText = `
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 30}%;
+            background: ${colores[Math.floor(Math.random() * colores.length)]};
+            width: ${6 + Math.random() * 8}px;
+            height: ${6 + Math.random() * 8}px;
+            border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+            animation-delay: ${Math.random() * 0.5}s;
+            animation-duration: ${1 + Math.random() * 0.8}s;
+          `;
+          card.appendChild(pieza);
+          setTimeout(() => pieza.remove(), 2200);
+        }, i * 60);
+      }
+    }
+
+    /* ---- Botones ---- */
+    $btnIniciar.addEventListener('click', iniciarJuego);
+    $btnReinit.addEventListener('click', () => {
+      mostrarPantalla('pantalla-inicio');
+    });
+
+    /* ---- Resaltar link activo en nav ---- */
+    document.querySelectorAll('.nav-enlaces a').forEach(a => {
+      if (a.href === window.location.href) a.classList.add('activo');
+    });
+  </script>
+</body>
+</html>

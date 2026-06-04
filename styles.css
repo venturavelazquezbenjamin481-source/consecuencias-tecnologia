@@ -169,6 +169,21 @@ footer {
   width: 60%;
 }
 
+.nav-juego-link {
+  color: var(--color-ambar) !important;
+  border-color: rgba(255,184,0,.2) !important;
+  background: rgba(255,184,0,.06) !important;
+}
+.nav-juego-link:hover {
+  background: rgba(255,184,0,.14) !important;
+  border-color: rgba(255,184,0,.4) !important;
+  box-shadow: 0 0 12px rgba(255,184,0,.2);
+}
+.nav-juego-link::after {
+  background: var(--color-ambar) !important;
+  box-shadow: 0 0 6px var(--color-ambar) !important;
+}
+
 /* Menú hamburguesa móvil */
 .nav-menu-btn {
   display: none;
