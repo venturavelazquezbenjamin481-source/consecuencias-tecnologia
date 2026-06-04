@@ -20,6 +20,13 @@
       padding: 7rem 1.5rem 2rem;
     }
 
+    /* El contenido debe quedar sobre el canvas de partículas de fondo */
+    .nave-hero,
+    #nave-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
     #nave-wrapper {
       max-width: 720px;
       margin: 0 auto;
@@ -246,7 +253,8 @@
         <li><a href="sociedad.html">Sociedad</a></li>
         <li><a href="ambiente.html">Ambiente</a></li>
         <li><a href="soluciones.html">Soluciones</a></li>
-        <li><a href="juego.html" class="nav-juego-link">🎮 Juego</a></li>
+        <li><a href="juego.html" class="nav-juego-link">🎮 Trivia</a></li>
+        <li><a href="nave.html" class="nav-juego-link">🚀 Arcade</a></li>
       </ul>
       <button class="nav-menu-btn" aria-label="Abrir menú" aria-expanded="false">
         <span></span><span></span><span></span>
