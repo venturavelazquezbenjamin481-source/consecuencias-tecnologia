@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuestra historia ♥</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Paleta y tipografía de la página de pareja */
+    :root {
+      --rosa-claro: #fff0f5;
+      --rosa: #ff8fab;
+      --rosa-fuerte: #fb6f92;
+      --durazno: #ffc2d1;
+      --lila: #cdb4db;
+      --vino: #6d2e46;
+      --blanco: #ffffff;
+      --sombra: 0 10px 30px rgba(251, 111, 146, 0.25);
+      --fuente-titulo: 'Dancing Script', cursive;
+      --fuente-texto: 'Quicksand', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--fuente-texto);
+      color: var(--vino);
+      background: linear-gradient(180deg, var(--rosa-claro) 0%, #fde2f3 50%, var(--rosa-claro) 100%);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Corazones flotantes de fondo */
+    .capa-corazones {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .corazon-flotante {
+      position: absolute;
+      bottom: -40px;
+      color: var(--rosa);
+      opacity: 0.6;
+      animation: subir linear forwards;
+    }
+
+    @keyframes subir {
+      to { transform: translateY(-110vh) rotate(25deg); opacity: 0; }
+    }
+
+    main, header, footer { position: relative; z-index: 1; }
+
+    /* Portada */
+    .seccion-portada {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .portada-nombres {
+      font-family: var(--fuente-titulo);
+      font-size: clamp(3rem, 11vw, 6.5rem);
+      color: var(--rosa-fuerte);
+      line-height: 1.1;
+      text-shadow: 0 4px 20px rgba(251, 111, 146, 0.3);
+    }
+
+    /* En celular, cada nombre va en su propia línea */
+    @media (max-width: 600px) {
+      .portada-nombres span { display: block; }
+      .portada-nombres .portada-corazon { display: inline-block; font-size: 0.7em; }
+    }
+
+    .portada-corazon {
+      display: inline-block;
+      animation: latido 1.2s ease-in-out infinite;
+    }
+
+    @keyframes latido {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.25); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.15); }
+    }
+
+    .portada-frase {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      max-width: 32rem;
+    }
+
+    .boton-bajar {
+      margin-top: 2.5rem;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 999px;
+      background: var(--rosa-fuerte);
+      color: var(--blanco);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: var(--sombra);
+      transition: transform 0.2s;
+    }
+
+    .boton-bajar:hover { transform: translateY(-3px); }
+
+    /* Secciones generales */
+    .seccion {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 5rem 1rem;
+    }
+
+    .titulo-seccion {
+      font-family: var(--fuente-titulo);
+      font-size: clamp(2.2rem, 6vw, 3.2rem);
+      color: var(--rosa-fuerte);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Contador de tiempo juntos */
+    .contador {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .contador-caja {
+      background: var(--blanco);
+      border-radius: 1.2rem;
+      padding: 1.5rem 0.5rem;
+      text-align: center;
+      box-shadow: var(--sombra);
+    }
+
+    .contador-numero {
+      display: block;
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--rosa-fuerte);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .contador-desde {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-style: italic;
+    }
+
+    /* Línea del tiempo */
+    .linea-tiempo {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .linea-tiempo::before {
+      content: '';
+      position: absolute;
+      left: 0.6rem;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(var(--rosa), var(--lila));
+      border-radius: 3px;
+    }
+
+    .momento {
+      position: relative;
+      background: var(--blanco);
+      border-radius: 1rem;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--sombra);
+    }
+
+    .momento::before {
+      content: '♥';
+      position: absolute;
+      left: -2rem;
+      top: 1.1rem;
+      color: var(--rosa-fuerte);
+      font-size: 1.3rem;
+      background: var(--rosa-claro);
+      line-height: 1;
+    }
+
+    .momento-fecha {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--rosa);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .momento h3 { margin: 0.2rem 0 0.4rem; }
+
+    /* Tarjetas de razones que giran */
+    .rejilla-razones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .tarjeta-razon {
+      perspective: 800px;
+      height: 170px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+    }
+
+    .tarjeta-interior {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .tarjeta-razon.volteada .tarjeta-interior { transform: rotateY(180deg); }
+
+    .tarjeta-cara {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      border-radius: 1.2rem;
+      backface-visibility: hidden;
+      box-shadow: var(--sombra);
+      text-align: center;
+    }
+
+    .tarjeta-frente {
+      background: linear-gradient(135deg, var(--rosa), var(--lila));
+      color: var(--blanco);
+      font-family: var(--fuente-titulo);
+      font-size: 1.8rem;
+    }
+
+    .tarjeta-reverso {
+      background: var(--blanco);
+      transform: rotateY(180deg);
+      font-weight: 500;
+    }
+
+    .ayuda { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; opacity: 0.8; }
+
+    /* Carta de amor */
+    .sobre {
+      max-width: 620px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .carta {
+      display: none;
+      margin-top: 1.5rem;
+      background: var(--blanco);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: left;
+      box-shadow: var(--sombra);
+      border-top: 6px solid var(--rosa);
+      animation: aparecer 0.8s ease;
+    }
+
+    .carta.abierta { display: block; }
+
+    .carta p + p { margin-top: 1rem; }
+
+    .carta-firma {
+      font-family: var(--fuente-titulo);
+      font-size: 1.8rem;
+      color: var(--rosa-fuerte);
+      text-align: right;
+    }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Animación al hacer scroll */
+    .revelar { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
+    .revelar.visible { opacity: 1; transform: translateY(0); }
+
+    .pie {
+      text-align: center;
+      padding: 3rem 1rem;
+      font-family: var(--fuente-titulo);
+      font-size: 1.6rem;
+      color: var(--rosa-fuerte);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .revelar { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="capa-corazones" aria-hidden="true"></div>
+
+  <header class="seccion-portada">
+    <h1 class="portada-nombres">
+      <span id="nombre-uno">Benjamín</span>
+      <span class="portada-corazon">♥</span>
+      <span id="nombre-dos">Mi amor</span>
+    </h1>
+    <p class="portada-frase">De todas las historias que existen, la nuestra es mi favorita.</p>
+    <a href="#contador" class="boton-bajar">Ver nuestra historia</a>
+  </header>
+
+  <main>
+    <!-- Tiempo que llevamos juntos -->
+    <section id="contador" class="seccion revelar">
+      <h2 class="titulo-seccion">Tiempo juntos</h2>
+      <div class="contador">
+        <div class="contador-caja"><span class="contador-numero" id="dias">0</span>días</div>
+        <div class="contador-caja"><span class="contador-numero" id="horas">0</span>horas</div>
+        <div class="contador-caja"><span class="contador-numero" id="minutos">0</span>minutos</div>
+        <div class="contador-caja"><span class="contador-numero" id="segundos">0</span>segundos</div>
+      </div>
+      <p class="contador-desde" id="texto-desde"></p>
+    </section>
+
+    <!-- Momentos importantes -->
+    <section class="seccion revelar">
+      <h2 class="titulo-seccion">Nuestros momentos</h2>
+      <div class="linea-tiempo">
+        <article class="momento">
+          <span class="momento-fecha">El comienzo</span>
+          <h3>El día que nos conocimos</h3>
+          <p>Nunca imaginé que una simple plática se convertiría en lo más bonito de mi vida.</p>
+        </article>
+        <article class="momento">
+          <span class="momento-fecha">Nuestra primera cita</span>
+          <h3>Nervios y sonrisas</h3>
+          <p>No recuerdo de qué hablamos, solo que no quería que se acabara.</p>
+        </article>
+        <article class="momento">
+          <span class="momento-fecha">El gran día</span>
+          <h3>Cuando dijiste que sí</h3>
+          <p>Desde ese momento, cada día tiene un poquito más de color.</p>
+        </article>
+        <article class="momento">
+          <span class="momento-fecha">Hoy y siempre</span>
+          <h3>Lo que viene</h3>
+          <p>Muchas aventuras, risas y recuerdos que todavía no escribimos.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Razones por las que te quiero -->
+    <section class="seccion revelar">
+      <h2 class="titulo-seccion">Razones por las que te quiero</h2>
+      <div class="rejilla-razones" id="rejilla-razones"></div>
+      <p class="ayuda">Toca cada tarjeta para descubrirla ♥</p>
+    </section>
+
+    <!-- Carta -->
+    <section class="seccion revelar">
+      <h2 class="titulo-seccion">Una carta para ti</h2>
+      <div class="sobre">
+        <button class="boton-bajar" id="boton-carta" type="button">💌 Abrir carta</button>
+        <article class="carta" id="carta">
+          <p>Mi amor:</p>
+          <p>Hice esta página para guardar un pedacito de lo que siento por ti. Gracias por tu paciencia, por tus risas, por escucharme y por hacer que los días normales se sientan especiales.</p>
+          <p>Contigo aprendí que querer a alguien es elegirlo todos los días, y yo te elijo hoy, mañana y todos los días que vengan.</p>
+          <p class="carta-firma">Con todo mi amor ♥</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">Tú y yo, siempre ♥</footer>
+
+  <script>
+    // Datos personalizables de la pareja
+    const DATOS_PAREJA = {
+      nombreUno: 'Benjamín',
+      nombreDos: 'Mi amor',
+      // Fecha en que empezamos (año, mes, día)
+      fechaInicio: '2025-02-14',
+      razones: [
+        'Tu sonrisa me arregla el día',
+        'Me haces reír como nadie',
+        'Siempre me escuchas',
+        'Contigo puedo ser yo mismo',
+        'Tus abrazos son mi lugar favorito',
+        'Me inspiras a ser mejor',
+        'Hasta el silencio contigo es bonito',
+        'Porque eres tú'
+      ]
+    };
+
+    // Nombres en la portada
+    document.getElementById('nombre-uno').textContent = DATOS_PAREJA.nombreUno;
+    document.getElementById('nombre-dos').textContent = DATOS_PAREJA.nombreDos;
+
+    // Contador de tiempo juntos
+    const inicio = new Date(DATOS_PAREJA.fechaInicio + 'T00:00:00');
+    document.getElementById('texto-desde').textContent =
+      'Desde el ' + inicio.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    function actualizarContador() {
+      const diferencia = Math.max(0, Date.now() - inicio.getTime());
+      const segundosTotales = Math.floor(diferencia / 1000);
+      document.getElementById('dias').textContent = Math.floor(segundosTotales / 86400).toLocaleString('es-MX');
+      document.getElementById('horas').textContent = Math.floor(segundosTotales % 86400 / 3600);
+      document.getElementById('minutos').textContent = Math.floor(segundosTotales % 3600 / 60);
+      document.getElementById('segundos').textContent = segundosTotales % 60;
+    }
+    actualizarContador();
+    setInterval(actualizarContador, 1000);
+
+    // Tarjetas de razones
+    const rejilla = document.getElementById('rejilla-razones');
+    DATOS_PAREJA.razones.forEach((razon, i) => {
+      const tarjeta = document.createElement('button');
+      tarjeta.type = 'button';
+      tarjeta.className = 'tarjeta-razon';
+      tarjeta.innerHTML =
+        '<div class="tarjeta-interior">' +
+          '<div class="tarjeta-cara tarjeta-frente">Razón #' + (i + 1) + '</div>' +
+          '<div class="tarjeta-cara tarjeta-reverso"></div>' +
+        '</div>';
+      tarjeta.querySelector('.tarjeta-reverso').textContent = razon;
+      tarjeta.addEventListener('click', () => tarjeta.classList.toggle('volteada'));
+      rejilla.appendChild(tarjeta);
+    });
+
+    // Abrir la carta
+    const botonCarta = document.getElementById('boton-carta');
+    botonCarta.addEventListener('click', () => {
+      document.getElementById('carta').classList.add('abierta');
+      botonCarta.style.display = 'none';
+      lluviaDeCorazones(25);
+    });
+
+    // Corazones flotantes
+    const capa = document.querySelector('.capa-corazones');
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function crearCorazon() {
+      const corazon = document.createElement('span');
+      corazon.className = 'corazon-flotante';
+      corazon.textContent = ['♥', '❤', '💕', '💗'][Math.floor(Math.random() * 4)];
+      corazon.style.left = Math.random() * 100 + 'vw';
+      corazon.style.fontSize = (12 + Math.random() * 22) + 'px';
+      corazon.style.animationDuration = (6 + Math.random() * 6) + 's';
+      capa.appendChild(corazon);
+      corazon.addEventListener('animationend', () => corazon.remove());
+    }
+
+    function lluviaDeCorazones(cantidad) {
+      if (sinMovimiento) return;
+      for (let i = 0; i < cantidad; i++) setTimeout(crearCorazon, i * 80);
+    }
+
+    if (!sinMovimiento) setInterval(crearCorazon, 700);
+
+    // Revelar secciones al hacer scroll
+    const observador = new IntersectionObserver((entradas) => {
+      entradas.forEach((entrada) => {
+        if (entrada.isIntersecting) {
+          entrada.target.classList.add('visible');
+          observador.unobserve(entrada.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.revelar').forEach((el) => observador.observe(el));
+  </script>
+</body>
+</html>
