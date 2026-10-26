@@ -3,6 +3,39 @@
 // U: pivote superior (fijo), L: rótula en el motor (se mueve con el cardán).
 export const ACT = { ball: 4.4, cup: 4.2, head: [6, 11], barrel: [11, 62], barrelR: 6.6, gland: [62, 67], rodR: 2.6, motor: [12.4, 42], motorR: 4.4, motorAt: 11.2 };
 
+// Fuelle de una línea de alimentación: entre la brida fija (top) y la brida
+// del motor (bottom, con su eje `axis`); cada onda se reparte a lo largo de la curva.
+export function bellowsSvg(G, k, P, top, bottom, axis, id, { r = 7.6, core = 5.6, count = 9, pitch = 1.1 } = {}) {
+  const V = G.viewOf(P);
+  const items = [];
+  const a0 = [0, 0, -1];
+  const a1 = G.mul3(axis, -1);
+  const length = G.len3(G.sub3(bottom, top));
+  // curva de Hermite entre las dos bridas, tangente a cada una
+  const at = (t) => {
+    const h00 = 2 * t ** 3 - 3 * t ** 2 + 1;
+    const h10 = t ** 3 - 2 * t ** 2 + t;
+    const h01 = -2 * t ** 3 + 3 * t ** 2;
+    const h11 = t ** 3 - t ** 2;
+    return [0, 1, 2].map((c) => h00 * top[c] + h10 * length * a0[c] + h01 * bottom[c] + h11 * length * a1[c]);
+  };
+  const tangent = (t) => G.unit3(G.sub3(at(Math.min(1, t + 0.01)), at(Math.max(0, t - 0.01))));
+  // el núcleo va en tramos cuyas uniones quedan bajo cada onda
+  for (let i = 0; i < count; i++) {
+    const p0 = at(i / count);
+    const p1 = at((i + 1) / count);
+    const F = G.frameAlong(p0, G.unit3(G.sub3(p1, p0)));
+    items.push({ key: G.dot3(G.lerp3(p0, p1, 0.5), V), svg: k.solidSvg(G.disc(0, G.len3(G.sub3(p1, p0)), core, F, P), { tone: "mid", crease: "none" }) });
+  }
+  for (let i = 1; i < count; i++) {
+    const t = i / count;
+    const F = G.frameAlong(at(t), tangent(t));
+    items.push({ key: G.dot3(at(t), V) + 0.01, svg: k.solidSvg(G.disc(-pitch / 2, pitch / 2, r, F, P), { tone: "hi" }) });
+  }
+  items.sort((a, b) => a.key - b.key);
+  return `<g data-bellows="${id}">${items.map((item) => item.svg).join("")}</g>`;
+}
+
 export function actuatorSvg(G, k, P, U, L, side, id) {
   const S = (paths, style) => k.solidSvg(paths, style);
   const Ln = (d, style) => k.lineSvg(d, style);

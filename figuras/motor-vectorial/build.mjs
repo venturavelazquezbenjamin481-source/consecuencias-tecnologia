@@ -8,7 +8,7 @@ import { turning } from "./anatomy/kit/turn-build.mjs";
 import * as TA from "./anatomy/kit/turn-audit.mjs";
 import { kitScript, turnScript, glScript } from "./anatomy/scripts/inline-kit.mjs";
 import { glCamera } from "./anatomy/kit/gl.mjs";
-import { ACT, actuatorSvg } from "./actuators.mjs";
+import { ACT, actuatorSvg, bellowsSvg } from "./actuators.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
@@ -24,11 +24,11 @@ const ELEVATION = 27;
 // Mundo en centímetros. G = centro del cardán.
 const ZG = 380;
 const GC = [0, 0, ZG];
-const DECK = { x: -170, y: -170, w: 340, d: 340, r: 10 };
+const DECK = { x: -140, y: -140, w: 280, d: 280, r: 10 };
 const DECK_H = 16;
 const FOOT_H = 8;
 const COLUMN = 26;
-const COLUMN_AT = [[-142, 142], [142, -142]];
+const COLUMN_AT = [[-114, 114], [114, -114]];
 const PLATE_Z = [ZG + 52, ZG + 62];
 const PLATE_R = 72;
 const BEAM_Z = ZG + 84;
@@ -92,11 +92,11 @@ function put(layer, name, centre, svg, shapes = [], bias = 0) {
 }
 
 // ───────────── Base: losa, patas, foso de llamas ─────────────
-const PIT = { x: -78, y: -78, w: 156, d: 156, r: 2 };
+const PIT = { x: -70, y: -70, w: 140, d: 140, r: 2 };
 const PIT_D = 46;
 function deck() {
   const feet = [];
-  for (const x of [-150, 0, 150]) for (const y of [-150, 0, 150]) if (x || y) feet.push([x, y]);
+  for (const x of [-122, 0, 122]) for (const y of [-122, 0, 122]) if (x || y) feet.push([x, y]);
   for (const [x, y] of byDepth(feet)) {
     const svg = S(k.cylinder(x, y, 10, -DECK_H - FOOT_H, 2, P, 28), { tone: "lo" }) + S(k.cylinder(x, y, 7.4, -DECK_H - FOOT_H + 2, FOOT_H - 2, P, 28), { tone: "mid" });
     put("back", `stand.foot.${x}.${y}`, [x, y, -DECK_H - FOOT_H], svg, [A.cylinder(x, y, 10, -DECK_H - FOOT_H, 2, { ground: true }), A.cylinder(x, y, 7.4, -DECK_H - FOOT_H + 2, FOOT_H - 2)], -50);
@@ -160,10 +160,10 @@ function pitRim() {
 
 // Placa de identificación grabada y regla en el borde de la losa
 function deckFurniture() {
-  const LABEL = { x: 104, y: 70, w: 50, d: 16, r: 1.6 };
+  const LABEL = { x: 82, y: 50, w: 46, d: 16, r: 1.6 };
   const svg = S(k.slabOf(LABEL, 0, 1, P, 3, 0.4), { tone: "mid" }) + Ln(k.planOutline(k.insetPlan(LABEL, 1.6), 1, P, 3), { tone: "faint" }) + k.faceTextSvg(k.topMatrix([LABEL.x + 5, LABEL.y + 7], 1, P, "x"), "TVC-1 · 400 kN", { size: 4, tone: "lo" }) + Ln([0, 1].map((row) => k.lineOnTop([LABEL.x + 5, LABEL.y + 10 + row * 2.2], [LABEL.x + (row ? 30 : 40), LABEL.y + 10 + row * 2.2], 1, P)).join(""), { tone: "lo", free: true }) + Dots([at([LABEL.x + 2.6, LABEL.y + LABEL.d / 2, 1]), at([LABEL.x + LABEL.w - 2.6, LABEL.y + LABEL.d / 2, 1])], { size: 0.45 });
   put("back", "stand.label", [LABEL.x + 25, LABEL.y + 8, 0], svg, [A.slab(LABEL, 0, 1)], -20);
-  const STRIP = { x: -150, y: DECK.y + DECK.d - 14, w: 230, d: 8, r: 1 };
+  const STRIP = { x: -120, y: DECK.y + DECK.d - 14, w: 180, d: 8, r: 1 };
   const t = k.topTicks(STRIP.x + 4, STRIP.x + STRIP.w - 4, 4, 5, STRIP.y + 1, 0.8, [2.2, 4.4], P);
   put("back", "stand.strip", [STRIP.x + 100, STRIP.y + 4, 0], S(k.slabOf(STRIP, 0, 0.8, P, 3), { tone: "lo", crease: "none" }) + Ln(t.minor, { tone: "lo" }) + Ln(t.major, { tone: "mid" }) + Dots([at([STRIP.x + 2.2, STRIP.y + 4, 0.8]), at([STRIP.x + STRIP.w - 2.2, STRIP.y + 4, 0.8])], { size: 0.45 }), [A.slab(STRIP, 0, 0.8)], -20);
 }
@@ -190,14 +190,14 @@ const ALONG = G.unit3([1, -1, 0]);
 const ACROSS = G.unit3([1, 1, 0]);
 function beam() {
   const half = 14;
-  const end = 200;
+  const end = 160;
   const ringAt = (o) => [[-end, -half], [end, -half], [end, half], [-end, half]].map(([a, c]) => G.add3(G.mul3(ALONG, a), G.mul3(ACROSS, c))).map(([x, y]) => [x, y]);
   const top = BEAM_Z + BEAM_H;
   const line = (offset) => k.onTop([G.add3(G.mul3(ALONG, -end), G.mul3(ACROSS, offset)), G.add3(G.mul3(ALONG, end), G.mul3(ACROSS, offset))].map(([x, y]) => [x, y]), top, P);
   const bolts = [];
-  for (let t = -180; t <= 180; t += 30) for (const s of [-1, 1]) bolts.push(at([...G.add3(G.mul3(ALONG, t), G.mul3(ACROSS, s * 8.5)).slice(0, 2), top]));
+  for (let t = -150; t <= 150; t += 30) for (const s of [-1, 1]) bolts.push(at([...G.add3(G.mul3(ALONG, t), G.mul3(ACROSS, s * 8.5)).slice(0, 2), top]));
   const face = [];
-  for (let t = -170; t <= 170; t += 68) {
+  for (let t = -136; t <= 136; t += 68) {
     const p = G.add3(G.mul3(ALONG, t), G.mul3(ACROSS, half));
     face.push(k.segment([p[0], p[1], BEAM_Z], [p[0], p[1], top], P));
   }
@@ -314,6 +314,92 @@ for (const id of ["A", "B"]) {
   T.ball({ name: `engine.lugball.${id}`, ...EN, c: L0[id], r: ACT.ball, flats: [{ n: G.mul3(out, -1), d: 4 }], tone: "hi", material: "steel" });
 }
 
+// ───────────── Turbobomba y conductos (todo en el grupo yaw) ─────────────
+const TP_AZ = 175;
+const TP_C = polar(TP_AZ, 48, ZG);
+const TF = G.frameOf(TP_C, [0, 0, -1], [1, 0, 0], [0, -1, 0]);
+const OUT = dir(TP_AZ);
+const tpPoint = (s, r, toward = OUT) => [TP_C[0] + toward[0] * r, TP_C[1] + toward[1] * r, ZG - s];
+const tp = (name, s0, s1, r, extra = {}) => T.round({ name, ...EN, F: TF, s0, s1, r, tone: "hi", crease: "lo", ...extra });
+tp("tp.inlet", 16, 18.5, 9, { tone: "mid", details: { bolts: [{ s: 16, r: 7.6, count: 8, size: 0.42 }] } });
+tp("tp.neck", 18.5, 24, 7, { tone: "mid" });
+tp("tp.lox", 24, 39, 13, { details: { seams: [27, 36] } });
+tp("tp.ring.0", 39, 41, 14.4, { tone: "mid", details: { bolts: [{ s: 39, r: 13.7, count: 18, size: 0.38, fade: FADE }] } });
+tp("tp.turbine", 41, 52, 15, { details: { seams: [44, 49] } });
+tp("tp.ring.1", 52, 54, 14.4, { tone: "mid" });
+tp("tp.fuel", 54, 68, 12, { details: { seams: [57, 65] } });
+tp("tp.cap", 68, 71, 12, { tone: "mid", details: { bolts: [{ s: 71, r: 10.6, count: 10, size: 0.38, fade: FADE }] } });
+
+// Un conducto recto con brida en cada extremo (las bridas son del conducto)
+function duct(name, from, to, r, { flange = 1.5, thick = 1.2, ends = [true, true], chunk = 60, gaps: extra = [] } = {}) {
+  const axis = G.unit3(G.sub3(to, from));
+  const length = G.len3(G.sub3(to, from));
+  const gaps = [...extra];
+  if (ends[0]) gaps.push([0, thick]);
+  if (ends[1]) gaps.push([length - thick, length]);
+  T.tube({ name, ...EN, route: [from, to], r, chunk, gaps, tone: "hi" });
+  [0, 1].forEach((end) => {
+    if (!ends[end]) return;
+    const centre = end ? G.add3(to, G.mul3(axis, -thick / 2)) : G.add3(from, G.mul3(axis, thick / 2));
+    T.round({ name: `${name}.flange${end}`, ...EN, F: frameOn(centre, axis, Math.abs(axis[2]) > 0.9 ? [1, 0, 0] : Z), s0: -thick / 2, s1: thick / 2, r: r * flange, tone: "mid", owner: name });
+  });
+}
+// Codo: bola con dos planos donde aterrizan los tubos
+function elbow(name, c, r, flats) {
+  T.ball({ name, ...EN, c, r, flats: flats.map(([n, d]) => ({ n, d })), tone: "hi", material: "steel" });
+  return flats.map(([n, d]) => G.add3(c, G.mul3(G.unit3(n), d)));
+}
+
+// LOX: de la bomba a la cámara, recto y horizontal
+duct("pipe.lox", tpPoint(35.5, -13), onE(TP_AZ, 22, 35.5), 2.4, { flange: 1.3 });
+// soporte de la turbobomba a la cámara
+T.round({ name: "tp.strut", ...EN, F: frameOn(onE(TP_AZ, 22, 61), OUT, Z), s0: 0, s1: 48 - 12 - 22, r: 1.8, tone: "mid" });
+// Escape de la turbina: tramo radial, codo y bajada hasta la altura de la salida
+const EXH_R = 4.5;
+const EXH_BALL = onE(TP_AZ, 72, 46);
+const [exhIn, exhDown] = elbow("exh.elbow", EXH_BALL, 7.2, [[G.mul3(OUT, -1), 4.7], [[0, 0, -1], 4.7]]);
+duct("exh.stub", tpPoint(46, 15), exhIn, EXH_R, { flange: 1.4, ends: [true, false] });
+const EXH_END = onE(TP_AZ, 72, 200);
+const BAND_AT = 120 - (46 + 4.7);
+duct("exh.duct", exhDown, EXH_END, EXH_R, { ends: [false, false], chunk: 200, gaps: [[BAND_AT - 1, BAND_AT + 1]] });
+T.round({ name: "exh.nozzle", ...EN, F: frameOn(EXH_END, [0, 0, -1], [1, 0, 0]), s0: 0, s1: 10, r: [EXH_R + 0.6, 7.4], tone: "mid", details: { seams: [2] } });
+T.round({ name: "exh.band", ...EN, F: frameOn(onE(TP_AZ, 72, 120), [0, 0, -1], [1, 0, 0]), s0: -1, s1: 1, r: EXH_R + 0.8, tone: "mid", owner: "exh.duct" });
+// Combustible: sale por abajo de la bomba, baja recto al colector en T y rodea la campana
+const RING_S = 140;
+const RING_R = 40;
+const RING_T = 2.2;
+const FUEL_X = tpPoint(71, -8);
+const TEE = onE(TP_AZ, RING_R, RING_S);
+const HALF = Math.asin(3.5 / RING_R) / DEG;
+const [teeUp, teeA, teeB] = elbow("fuel.tee", TEE, 4.2, [[[0, 0, 1], 2.9], [dir(TP_AZ + HALF + 90), 3.5], [dir(TP_AZ - HALF - 90), 3.5]]);
+duct("fuel.duct", FUEL_X, teeUp, 3, { flange: 1.33, ends: [true, false], chunk: 200 });
+{
+  const ring = G.arcPoints(EF, RING_S, RING_R, -(TP_AZ + HALF) * DEG, -(TP_AZ + 360 - HALF) * DEG, 96);
+  T.tube({ name: "fuel.ring", ...EN, route: ring, r: RING_T, chunk: 40, turn: 30, tone: "hi" });
+  void teeA;
+  void teeB;
+}
+// Entrada de combustible: tramo corto, codo hacia arriba y brida donde llega el fuelle
+const FIN_DIR = dir(120);
+const FIN_BALL = [TP_C[0] + FIN_DIR[0] * 22, TP_C[1] + FIN_DIR[1] * 22, ZG - 60];
+const [finIn, finUp] = elbow("fuel.inlet.elbow", FIN_BALL, 4.6, [[G.mul3(FIN_DIR, -1), 3.6], [[0, 0, 1], 3.6]]);
+duct("fuel.inlet.stub", [TP_C[0] + FIN_DIR[0] * 12, TP_C[1] + FIN_DIR[1] * 12, ZG - 60], finIn, 2.6, { ends: [true, false] });
+const FIN_TOP = G.add3(finUp, [0, 0, 3]);
+duct("fuel.inlet.riser", finUp, FIN_TOP, 2.6, { ends: [false, false] });
+T.round({ name: "fuel.inlet.flange", ...EN, F: frameOn(FIN_TOP, [0, 0, 1], [1, 0, 0]), s0: 0, s1: 1.6, r: 5.4, tone: "mid", details: { bolts: [{ s: 1.6, r: 4.4, count: 6, size: 0.38 }] } });
+export const FEEDS = {
+  lox: { top: [TP_C[0], TP_C[1], 400], bottom: [TP_C[0], TP_C[1], ZG - 16] },
+  fuel: { top: [FIN_TOP[0], FIN_TOP[1], 396], bottom: [FIN_TOP[0], FIN_TOP[1], FIN_TOP[2] + 1.6] },
+};
+
+// Líneas fijas de alimentación, de la placa de empuje a la brida superior de cada fuelle
+for (const [id, feed, r] of [["lox", FEEDS.lox, 5.2], ["fuel", FEEDS.fuel, 3.6]]) {
+  const [x, y] = feed.top;
+  const flangeR = r + 3;
+  const svg = S(k.cylinder(x, y, r, feed.top[2] + 2, PLATE_Z[0] - feed.top[2] - 2, P, 32), { tone: "mid", crease: "none", inner: Ln([0.3, 0.6].map((f) => k.sideArc(x, y, r, feed.top[2] + 2 + f * (PLATE_Z[0] - feed.top[2] - 2), P, 24)).join(""), { tone: "faint" }) }) + S(k.cylinder(x, y, flangeR, feed.top[2], 2, P, 40, 0.3), { tone: "mid" }) + S(k.cylinder(x, y, flangeR, PLATE_Z[0] - 2, 2, P, 40, 0.3), { tone: "mid" });
+  put("mid", `stand.feed.${id}`, [x, y, feed.top[2]], svg, [A.cylinder(x, y, flangeR, feed.top[2], 2), A.cylinder(x, y, r, feed.top[2] + 2, PLATE_Z[0] - feed.top[2] - 4), A.cylinder(x, y, flangeR, PLATE_Z[0] - 2, 2)], 40);
+}
+
 export const follow = (values) => ({ ...values });
 export const poses = () => {
   const out = [];
@@ -334,7 +420,7 @@ if (argv.includes("--audit")) {
 const LABEL = "Banco de pruebas de vectorización de empuje: un motor cohete cuelga de un cardán de dos ejes bajo la placa de empuje de un pórtico de dos columnas. Dos actuadores electromecánicos, a 90° entre sí, empujan el motor por debajo del cardán y lo inclinan; bajo la tobera hay un foso de llamas en la losa.";
 const backSvg = k.figureSvg({ width: W, height: H, label: LABEL, body: [`<path class="iso-halo" d="${k.haloOf(DECK, -DECK_H - FOOT_H, DECK_H, P)}"/>`, ...layerOf("back")] });
 const layerSvg = (list, cls) => `<svg xmlns="http://www.w3.org/2000/svg" class="iso-svg iso-layer ${cls}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${list.join("")}</svg>`;
-const restActs = ["A", "B"].map((id) => actuatorSvg(G, k, P, U[id], L0[id], SIDE[id], id)).join("");
+const restActs = ["lox", "fuel"].map((id) => bellowsSvg(G, k, P, FEEDS[id].top, FEEDS[id].bottom, [0, 0, 1], id, id === "fuel" ? { r: 5.6, core: 3.8, count: 14 } : {})).join("") + ["A", "B"].map((id) => actuatorSvg(G, k, P, U[id], L0[id], SIDE[id], id)).join("");
 const actSvg = layerSvg([restActs], "tv-acts");
 const midSvg = layerSvg(layerOf("mid"), "tv-mid");
 const frontSvg = layerSvg(layerOf("front"), "tv-front");
@@ -342,7 +428,7 @@ const stage = `<div class="iso-stage iso-turn tv-stage" tabindex="0" role="appli
 
 const DATA = {
   W, H, P, model: MODEL, turn: out.data,
-  U, L0, SIDE, A1, A2, GC, exitS: BELL_S[1], exitR: EXIT_R,
+  U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R,
   camera: glCamera(P),
 };
 // La biblioteca de tornos del kit, envuelta para no chocar con nombres de la página

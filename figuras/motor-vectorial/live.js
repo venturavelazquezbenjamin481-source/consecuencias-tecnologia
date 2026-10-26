@@ -64,7 +64,9 @@ function draw() {
   controller.set({ pitch: p, yaw: q });
   const a = stroke("A");
   const b = stroke("B");
-  actLayer.innerHTML = actuatorSvg(G, K, P, DATA.U.A, a.L, DATA.SIDE.A, "A") + actuatorSvg(G, K, P, DATA.U.B, b.L, DATA.SIDE.B, "B");
+  const up = controller.anchor("yaw", DATA.GC, [0, 0, 1]).direction;
+  const feed = (id, opts) => bellowsSvg(G, K, P, DATA.FEEDS[id].top, controller.anchor("yaw", DATA.FEEDS[id].bottom).world, up, id, opts);
+  actLayer.innerHTML = feed("lox", {}) + feed("fuel", { r: 5.6, core: 3.8, count: 14 }) + actuatorSvg(G, K, P, DATA.U.A, a.L, DATA.SIDE.A, "A") + actuatorSvg(G, K, P, DATA.U.B, b.L, DATA.SIDE.B, "B");
   // ángulo total entre el eje del motor y la vertical
   const e = controller.anchor("yaw", DATA.GC, [0, 0, -1]).direction;
   const delta = Math.acos(Math.min(1, -e[2])) / D2R;
