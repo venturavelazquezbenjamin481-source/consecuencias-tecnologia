@@ -92,7 +92,8 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
 ## Anatomía (segunda tanda)
 
 - **Despiece** (`explode.mjs`): cuatro grupos deslizantes hijos del motor — tobera (baja 70), turbobomba
-  (sale 70 hacia fuera), y de ella el escape (26 más) y el generador de gas (baja 60). Muelles críticos
+  (sale 70 hacia fuera), y de ella el escape (26 más) y el generador de gas (baja 70, apartándose un poco de
+  la turbina para no rozar su conector esférico, que se queda con ella). Muelles críticos
   escalonados; la misma función analítica mueve la página y alimenta la auditoría (clips «despiece» y
   «montaje»). Las piezas se asignan a su grupo por prefijo de nombre (`GROUP_OF` en `build.mjs`).
 - **Selección**: nueve conjuntos (`ASSEMBLIES` en `build.mjs`) con ficha. El resaltado es CSS generado
@@ -109,7 +110,8 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
   entre grupos (`framedCloud`); con 32, piezas largas (escape, campana) daban planos falsos en el despiece.
 - **Poses de prueba**: el motor 3D muestrea como mucho 24 estados para sus planos entre grupos; por eso
   `poses()` da solo extremos del cardán y estados «prefijo» del despiece (cubren todo fotograma real).
-- **Continuidad**: la auditoría orbital marca 44 avisos de continuidad en piezas de la cámara con la
+- **Auditoría completa** (2026-10-26): todas las líneas en 0 salvo continuidad.
+- **Continuidad**: la auditoría orbital marca avisos (649 en la completa, 44 en la rápida) de continuidad en piezas de la cámara con la
   guiñada entre −5,5° y −4°. Medido en píxeles (segunda diferencia en barridos de 0,1° y 0,02°) no hay
   ningún salto visible: son piezas tapadas por la placa del inyector y los anillos, y la prueba las mide
   aisladas. La guía de la skill lo trata como fallo del motor 3D (beta) en primitivas simples.

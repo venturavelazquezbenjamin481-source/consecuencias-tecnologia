@@ -2,7 +2,7 @@
 // La misma función mueve la página y alimenta la auditoría, así que lo que se prueba es lo que se ve.
 export const EXPLODE = {
   order: ["nozzle", "tp", "exh", "gg"],
-  travel: { nozzle: 70, tp: 70, exh: 26, gg: 60 },
+  travel: { nozzle: 70, tp: 70, exh: 26, gg: 70 },
   omega: 7.5,
   stagger: 0.14,
 };

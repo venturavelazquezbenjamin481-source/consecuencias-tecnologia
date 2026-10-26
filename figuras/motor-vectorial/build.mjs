@@ -368,7 +368,8 @@ const TPD = dir(175);
 const nozzleG = T.group("nozzle", { parent: yaw, slide: { direction: [0, 0, -1], travel: EXPLODE.travel.nozzle } });
 const tpG = T.group("tp", { parent: yaw, slide: { direction: TPD, travel: EXPLODE.travel.tp } });
 const exhG = T.group("exh", { parent: tpG, slide: { direction: TPD, travel: EXPLODE.travel.exh } });
-const ggG = T.group("gg", { parent: tpG, slide: { direction: [0, 0, -1], travel: EXPLODE.travel.gg } });
+// el generador se aparta de la turbina antes de bajar: así deja atrás su conector sin rozarlo
+const ggG = T.group("gg", { parent: tpG, slide: { direction: G.unit3(G.add3(G.mul3(dir(175 + 90), 0.25), [0, 0, -1])), travel: EXPLODE.travel.gg } });
 const GROUP_OF = [
   [["engine.bell", "engine.lip", "fuel.ring", "fuel.tee"], nozzleG],
   [["tp.", "pipe.lox", "fuel.duct", "fuel.inlet", "sensor.tp"], tpG],
@@ -505,7 +506,7 @@ const GGF = G.frameOf([GG_C[0], GG_C[1], ZG], [0, 0, -1], [1, 0, 0], [0, -1, 0])
 T.round({ name: "gg.body", ...EN, F: GGF, s0: 31, s1: 50, r: 5.5, ends: ["dome", "dome"], tone: "hi", crease: "lo", material: "steel", details: { seams: [40.5] } });
 T.round({ name: "gg.igniter", ...EN, F: GGF, s0: 31 - 5.5 - 3, s1: 31 - 5.5, r: 1.4, tone: "mid" });
 // conector esférico entre el generador y la turbina (tangente a los dos)
-T.ball({ name: "gg.outlet", ...EN, c: [TP_C[0] + GG_DIR[0] * 17.75, TP_C[1] + GG_DIR[1] * 17.75, ZG - 42], r: 2.75, tone: "hi", material: "steel" });
+T.ball({ name: "tp.gg-outlet", ...EN, c: [TP_C[0] + GG_DIR[0] * 17.75, TP_C[1] + GG_DIR[1] * 17.75, ZG - 42], r: 2.75, tone: "hi", material: "steel" });
 // Transductores de presión sobre la cámara y la turbobomba
 for (const [name, az, s, r] of [["sensor.pc", 30, 60, 22], ["sensor.pc2", -60, 42, 22], ["sensor.tp", TP_AZ + 30, 64, 12]]) {
   const host = name === "sensor.tp" ? [TP_C[0], TP_C[1]] : [0, 0];
