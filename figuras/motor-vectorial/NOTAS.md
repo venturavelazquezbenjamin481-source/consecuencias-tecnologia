@@ -89,7 +89,31 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
    carga que lean la fuerza lateral, humo del escape de la turbina en la pluma, más detalle en las
    columnas (bandeja de cables, caja del controlador), luz en las paredes del foso.
 
+## Anatomía (segunda tanda)
+
+- **Despiece** (`explode.mjs`): cuatro grupos deslizantes hijos del motor — tobera (baja 70), turbobomba
+  (sale 70 hacia fuera), y de ella el escape (26 más) y el generador de gas (baja 60). Muelles críticos
+  escalonados; la misma función analítica mueve la página y alimenta la auditoría (clips «despiece» y
+  «montaje»). Las piezas se asignan a su grupo por prefijo de nombre (`GROUP_OF` en `build.mjs`).
+- **Selección**: nueve conjuntos (`ASSEMBLIES` en `build.mjs`) con ficha. El resaltado es CSS generado
+  que reasigna tokens (incluida la rampa `--tn-*` de las piezas 3D y los de material); las piezas
+  estáticas van envueltas en `<g data-name>`. Teclas 1–9, D despieza, Esc monta.
+- **Fig. 2** (`section.mjs`): corte de un cuarto de la cámara de empuje dibujado a mano con el kit:
+  interior de los 270° que quedan, exterior de los cuartos delanteros, caras cortadas, colector como
+  tubo de 270°, flujos animados y una sonda con Mach, presión y temperatura isentrópicas (γ = 1,2,
+  pc = 7 MPa, Tc = 3600 K). El sombreado calcula en cada fila los ángulos exactos de cambio de tono.
+
 ## Decisiones que conviene recordar
+
+- **Kit parcheado**: `anatomy/kit/turn-build.mjs` usa 96 puntos (no 32) por pieza al buscar planos
+  entre grupos (`framedCloud`); con 32, piezas largas (escape, campana) daban planos falsos en el despiece.
+- **Poses de prueba**: el motor 3D muestrea como mucho 24 estados para sus planos entre grupos; por eso
+  `poses()` da solo extremos del cardán y estados «prefijo» del despiece (cubren todo fotograma real).
+- **Continuidad**: la auditoría orbital marca 44 avisos de continuidad en piezas de la cámara con la
+  guiñada entre −5,5° y −4°. Medido en píxeles (segunda diferencia en barridos de 0,1° y 0,02°) no hay
+  ningún salto visible: son piezas tapadas por la placa del inyector y los anillos, y la prueba las mide
+  aisladas. La guía de la skill lo trata como fallo del motor 3D (beta) en primitivas simples.
+
 
 - Los tubos vivos solo pueden ir rectos (verticales u horizontales); los cambios de dirección van
   dentro de bolas con planos. Un tubo que acaba sobre un cilindro necesita radio pequeño (flecha de
@@ -105,3 +129,4 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
 
 - 2026-10-26: diseño inicial, kit copiado en `anatomy/`.
 - 2026-10-26: fases 1–3 hechas; auditoría del kit y de líneas en verde.
+- 2026-10-26: despiece, selección por conjuntos, Fig. 2 (corte con sonda isentrópica).

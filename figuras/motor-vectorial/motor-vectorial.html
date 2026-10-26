@@ -6540,6 +6540,11 @@ cut.addEventListener("keydown", (event) => {
   probeS = Math.max(S_MIN, Math.min(S_MAX, (probeS ?? CD.throatS) + (event.key === "ArrowDown" ? 4 : -4)));
   drawProbe();
 });
+window.__tv.tour = (t) => {
+  touring = true;
+  tourClock = t;
+  run();
+};
 window.__tv.probe = (s) => {
   probeS = s;
   drawProbe();
