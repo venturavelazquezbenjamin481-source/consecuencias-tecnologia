@@ -128,8 +128,10 @@ function setApart(on) {
 function select(id) {
   if (focus === id) return;
   focus = id;
-  if (id) stage.setAttribute("data-focus", id);
-  else stage.removeAttribute("data-focus");
+  for (const el of document.querySelectorAll(".tv-stage")) {
+    if (id) el.setAttribute("data-focus", id);
+    else el.removeAttribute("data-focus");
+  }
   partButtons.forEach((button) => button.toggleAttribute("data-on", button.dataset.part === id));
   const a = DATA.assemblies.find((entry) => entry.id === id);
   infoTitle.textContent = a ? `${String(DATA.assemblies.indexOf(a) + 1).padStart(2, "0")} · ${a.name}` : INFO_REST.title;
@@ -483,4 +485,68 @@ window.__tv = {
     draw();
     paintPlume();
   },
+};
+
+// ───────────── Fig. 2: sonda a lo largo del eje ─────────────
+const cut = document.querySelector(".tv-cut");
+const probe = cut.querySelector(".tv-probe");
+const readout2 = document.querySelector("[data-readout2]");
+const CD = DATA.cut;
+const P2 = CD.P;
+const F2 = G.frameOf([0, 0, CD.Z0], [0, 0, -1], [1, 0, 0], [0, -1, 0]);
+const gasAt = (s) => {
+  const x = (s - CD.s0) / CD.ds;
+  const i = Math.max(0, Math.min(CD.gas.length - 2, Math.floor(x)));
+  return CD.gas[i] + (CD.gas[i + 1] - CD.gas[i]) * (x - i);
+};
+const AZ2 = P2.azimuth;
+const theta2 = (az) => (-az * Math.PI) / 180;
+const S_MIN = 33;
+const S_MAX = CD.exitS;
+let probeS = null;
+function machAt(s) {
+  const ratio = (gasAt(s) / CD.throatR) ** 2;
+  return machOf(Math.max(1, ratio), s > CD.throatS, CD.gamma);
+}
+function drawProbe() {
+  if (probeS === null) {
+    probe.innerHTML = "";
+    readout2.textContent = "Mach · presión · temperatura";
+    return;
+  }
+  const s = probeS;
+  const r = gasAt(s);
+  // la circunferencia del gas a esa altura: contra la pared de atrás y a través de la cuña abierta
+  const back = G.arcOf(F2, s, r, P2, { inward: true, from: theta2(AZ2 + 315), to: theta2(AZ2 + 45) });
+  const open = G.arcOf(F2, s, r, P2, { from: theta2(AZ2 + 45), to: theta2(AZ2 - 45), least: -1 });
+  probe.innerHTML = lineSvg(back + open, { tone: "lit" }).replace("<path", '<path style="stroke-width:1.2"');
+  const M = machAt(s);
+  const p = M_PC * pOf(M, CD.gamma);
+  const T = M_TC * tOf(M, CD.gamma);
+  const where = s < 80 ? "cámara" : s < CD.throatS - 1 ? "convergente" : s < CD.throatS + 3 ? "garganta" : "campana";
+  readout2.textContent = `${where} · Mach ${M.toFixed(2)} · ${p >= 1 ? p.toFixed(2) + " MPa" : (p * 1000).toFixed(0) + " kPa"} · ${T.toFixed(0)} K`;
+}
+const M_PC = DATA.model.pcMPa;
+const M_TC = DATA.model.tcK;
+const yOf = (s) => iso([0, 0, CD.Z0 - s], P2)[1];
+cut.addEventListener("pointermove", (event) => {
+  const box = cut.getBoundingClientRect();
+  const y = ((event.clientY - box.top) / box.height) * CD.H;
+  const s = S_MIN + ((y - yOf(S_MIN)) / (yOf(S_MAX) - yOf(S_MIN))) * (S_MAX - S_MIN);
+  probeS = Math.max(S_MIN, Math.min(S_MAX, s));
+  drawProbe();
+});
+cut.addEventListener("pointerleave", () => {
+  probeS = null;
+  drawProbe();
+});
+cut.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+  event.preventDefault();
+  probeS = Math.max(S_MIN, Math.min(S_MAX, (probeS ?? CD.throatS) + (event.key === "ArrowDown" ? 4 : -4)));
+  drawProbe();
+});
+window.__tv.probe = (s) => {
+  probeS = s;
+  drawProbe();
 };

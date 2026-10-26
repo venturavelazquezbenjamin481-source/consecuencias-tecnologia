@@ -11,6 +11,7 @@ import { glCamera } from "./anatomy/kit/gl.mjs";
 import { ACT, actuatorSvg, bellowsSvg } from "./actuators.mjs";
 import { tubePieces, tubeSvg } from "./anatomy/kit/tube.mjs";
 import { EXPLODE, explodeAt, slidesOf, springStep } from "./explode.mjs";
+import { sectionSvg, profiles, machOf, pOf, tOf, GAMMA } from "./section.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
@@ -49,7 +50,7 @@ const EF = G.frameOf([0, 0, ZG], [0, 0, -1], [1, 0, 0], [0, -1, 0]);
 const onE = (deg, r, s) => polar(deg, r, ZG - s);
 
 // Modelo (la verdad que muestran las lecturas)
-export const MODEL = { thrustKN: 400, limit: 6, rate: 20, omega: 14, zeta: 0.8, leverM: 15 };
+export const MODEL = { thrustKN: 400, limit: 6, rate: 20, omega: 14, zeta: 0.8, leverM: 15, pcMPa: 7, tcK: 3600 };
 
 // Campana: r(s) cóncava (cuadrática), de la garganta a la salida
 const BELL_S = [98, 214];
@@ -609,8 +610,28 @@ const FOCUS_CSS = [
   ...ASSEMBLIES.map((a) => `.tv-stage[data-focus="${a.id}"] :is(${sel(a)}){--anatomy-lit:inherit;--anatomy-lit-top:inherit;--anatomy-lit-shade:inherit;--anatomy-hi:var(--anatomy-lit);--anatomy-mid:var(--anatomy-hi);--tn-0:var(--anatomy-lit-shade);--tn-1:var(--anatomy-lit-shade);--tn-2:var(--anatomy-lit-shade);--tn-3:var(--anatomy-lit-shade);--tn-4:var(--anatomy-lit-top)}\n.tv-stage[data-focus="${a.id}"] :is(${sel(a)}) :is(.iso-top,.tb-shine){fill:var(--anatomy-lit-top)}\n.tv-stage[data-focus="${a.id}"] :is(${sel(a)}) :is(.iso-shade,.tb-body){fill:var(--anatomy-lit-shade)}`),
 ].join("\n");
 
+// ───────────── Fig. 2: corte de la cámara de empuje ─────────────
+const W2 = 900;
+const H2 = 820;
+const Z0 = 230;
+const SECTION_RINGS = { list: [[50, 53, 23.8], [68, 76, 25.5], ...BANDS.slice(0, -1).map(([, s1], i) => [s1, BANDS[i + 1][0], bell(BANDS[i + 1][0]) + 1.8])], manifoldS: RING_S, manifoldR: RING_R, manifoldT: RING_T };
+const P2 = k.fitProjection([...Array.from({ length: 24 }, (_, i) => [Math.cos((i / 24) * 2 * Math.PI) * (EXIT_R + 3), Math.sin((i / 24) * 2 * Math.PI) * (EXIT_R + 3), Z0 - 217]), ...Array.from({ length: 24 }, (_, i) => [Math.cos((i / 24) * 2 * Math.PI) * 42, Math.sin((i / 24) * 2 * Math.PI) * 42, Z0 - 14])], W2, H2, { pad: 50, azimuth: AZIMUTH, elevation: ELEVATION });
+const CUT = sectionSvg(k, G, P2, { bell, BELL_S, EXIT_R, Z0, rings: SECTION_RINGS, injector: { r: 27.5 } });
+const PROF = profiles(bell, BELL_S);
+const GAS = [];
+for (let sv = 14; sv <= 220; sv += 0.5) GAS.push(+PROF.gas(sv).toFixed(3));
+const EXIT_GAS = PROF.gas(BELL_S[1]);
+const EPS_GAS = (EXIT_GAS / PROF.throatR) ** 2;
+const MACH_EXIT = machOf(EPS_GAS, true);
+const LABEL2 = "Medio corte de la cámara de empuje por un plano que contiene su eje: la cúpula de oxígeno sobre la placa de inyección, la cámara, la garganta y la campana, con la pared y sus canales de refrigeración cortados y el colector de combustible en sección.";
+const cutSvg = k.figureSvg({ width: W2, height: H2, label: LABEL2, body: [CUT.svg, '<g class="tv-probe"></g>'] });
+const corners2 = `<div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 2</span><span class="iso-plate-corner" data-corner="title">Corte · cámara de empuje</span><span class="iso-plate-corner" data-corner="hint">Recorre el eje con el puntero</span><span class="iso-plate-corner" data-corner="readout" data-readout2>Mach · presión · temperatura</span></div>`;
+const caption2 = `Dentro del motor. El oxígeno (azul) llena la cúpula y baja por los orificios de la placa; el queroseno (rojo) entra por el colector de la campana y sube por los canales de la pared, enfriándola, hasta el anillo del inyector. Arden a ${MODEL.pcMPa} MPa y unos ${MODEL.tcK} K. El gas (blanco) acelera: en la garganta, de ${(2 * PROF.throatR).toFixed(0)} cm, llega a Mach 1; en la salida, con relación de áreas ε ≈ ${EPS_GAS.toFixed(0)}, a Mach ${MACH_EXIT.toFixed(1)}, a ${(MODEL.pcMPa * pOf(MACH_EXIT) * 1000).toFixed(0)} kPa y ${(MODEL.tcK * tOf(MACH_EXIT)).toFixed(0)} K. Los valores salen de las relaciones isentrópicas con γ = ${GAMMA}.`;
+const fig2 = `<figure class="iso-figure tv tv-fig2"><div class="iso-plate">${corners2}<div class="iso-stage tv-stage tv-cut" tabindex="0" role="application" aria-label="Corte de la cámara de empuje: mueve el puntero o usa las flechas arriba y abajo para recorrer el eje">${cutSvg}</div></div>${k.plateHtml({ fig: "", keys: [{ mark: "blue", label: "Oxígeno líquido" }, { mark: "red", label: "Queroseno por los canales de la pared" }, { mark: "lit", label: "Gas de combustión" }], caption: caption2, body: "" }).replace(/^[\s\S]*?(<figcaption)/, "$1").replace(/<\/figure>$/, "")}</figure>`;
+
 const DATA = {
   W, H, P, model: MODEL, turn: out.data,
+  cut: { W: W2, H: H2, P: P2, Z0, gas: GAS, s0: 14, ds: 0.5, throatS: PROF.throatS, throatR: PROF.throatR, gamma: GAMMA, exitS: BELL_S[1] },
   explode: EXPLODE, assemblies: ASSEMBLIES.map(({ id, name, text }) => ({ id, name, text })),
   U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R, pit: [PIT.x, PIT.y, PIT.x + PIT.w, PIT.y + PIT.d], pitD: PIT_D, deck: [DECK.x, DECK.y, DECK.x + DECK.w, DECK.y + DECK.d],
   camera: glCamera(P),
@@ -621,6 +642,7 @@ const latheNames = [...latheSource.matchAll(/^export (?:function|const) (\w+)/gm
 const G_SCRIPT = `const G = (() => {\n${latheSource.replace(/^export /gm, "")}\nreturn { ${latheNames.join(", ")} };\n})();\n`;
 const ACT_SCRIPT = readFileSync(join(HERE, "actuators.mjs"), "utf8").replace(/^export /gm, "");
 const EXPLODE_SCRIPT = readFileSync(join(HERE, "explode.mjs"), "utf8").replace(/^export /gm, "");
+const SECTION_SCRIPT = ["GAMMA", "machOf", "pOf", "tOf"].map((name) => (name === "GAMMA" ? "" : "")).join("") + `const GAMMA = ${GAMMA};\nconst machOf = ${machOf.toString()};\nconst pOf = ${pOf.toString()};\nconst tOf = ${tOf.toString()};\n`;
 const CSS = out.css + "\n" + readFileSync(join(HERE, "tvc.css"), "utf8") + "\n" + FOCUS_CSS;
 const LIVE = readFileSync(join(HERE, "live.js"), "utf8").replace("__DATA__", JSON.stringify(DATA));
 const corners = `<div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 1</span><span class="iso-plate-corner" data-corner="title">Empuje vectorial · banco TVC-1</span><span class="iso-plate-corner" data-corner="hint">Mueve el puntero para apuntar la tobera</span><span class="iso-plate-corner" data-corner="readout" data-readout>δ 0.0° · frío</span></div>`;
@@ -638,8 +660,8 @@ const legend = k.plateHtml({
 const controls = `<div class="tv-controls"><button type="button" class="tv-fire" data-fire><span class="tv-lamp" aria-hidden="true"></span><span data-fire-label>Encender</span></button><button type="button" class="tv-fire" data-apart><span class="tv-lamp" aria-hidden="true"></span><span data-apart-label>Despiezar</span></button><span class="tv-live" aria-live="polite" data-say></span></div>`;
 const PARTS = ASSEMBLIES.map((a, i) => `<button type="button" class="tv-part" data-part="${a.id}"><span class="tv-num">${String(i + 1).padStart(2, "0")}</span>${a.name}</button>`).join("");
 const INFO = `<div class="tv-info" data-info aria-live="polite"><span class="tv-info-title" data-info-title>Anatomía</span><span class="tv-info-text" data-info-text>Pasa por un conjunto de la lista, o pulsa su número, para despiezar el motor y resaltarlo. D despieza o monta; Esc vuelve.</span></div>`;
-const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div><div class="tv-anatomy"><div class="tv-parts" role="group" aria-label="Conjuntos del motor">${PARTS}</div>${INFO}</div>${legend}</figure>`;
-const page = k.pageHtml({ title: "Empuje vectorial", theme: THEME, body, script: kitScript() + G_SCRIPT + ACT_SCRIPT + EXPLODE_SCRIPT + turnScript() + glScript() + (verify ? `window.__isoVerify = ${JSON.stringify(out.verify)};\n` : "") + LIVE, width: 940 });
+const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div><div class="tv-anatomy"><div class="tv-parts" role="group" aria-label="Conjuntos del motor">${PARTS}</div>${INFO}</div>${legend}</figure>${fig2}`;
+const page = k.pageHtml({ title: "Empuje vectorial", theme: THEME, body, script: kitScript() + G_SCRIPT + ACT_SCRIPT + EXPLODE_SCRIPT + SECTION_SCRIPT + turnScript() + glScript() + (verify ? `window.__isoVerify = ${JSON.stringify(out.verify)};\n` : "") + LIVE, width: 940 });
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const name = `motor-vectorial${verify ? "-verify" : ""}${THEME === "light" ? "-light" : ""}.html`;
   writeFileSync(join(HERE, name), page);
