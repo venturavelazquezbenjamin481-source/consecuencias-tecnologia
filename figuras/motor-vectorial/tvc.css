@@ -7,7 +7,7 @@
 .tv-plume{display:block}
 .tv-stage>.tv-plume{mix-blend-mode:normal}
 .iso[data-theme="dark"] .tv-stage>.tv-plume{mix-blend-mode:screen}
-.tv-controls{display:flex;align-items:center;gap:14px;margin-top:6px;font:12px/1.4 var(--anatomy-mono,ui-monospace,monospace);color:var(--anatomy-muted)}
+.tv-controls{display:grid;gap:8px;margin-top:6px;font:12px/1.4 var(--anatomy-mono,ui-monospace,monospace);color:var(--anatomy-muted)}
 .tv-fire{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--anatomy-faint);border-radius:6px;background:transparent;color:var(--anatomy-text);font:inherit;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .tv-fire:hover{border-color:var(--anatomy-muted)}
 .tv-fire:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:3px}
@@ -31,3 +31,35 @@
 .tv-info-title{font-family:var(--anatomy-mono,ui-monospace,monospace);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--anatomy-muted)}
 .tv-fire[data-apart][data-on] .tv-lamp{background:var(--anatomy-lit);box-shadow:none}
 .tv-stage :is([data-name],[data-act],[data-bellows]){transition:none}
+.tv-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.tv-fire[data-phase="start"] .tv-lamp{animation:tv-blink .5s steps(2,start) infinite}
+.tv-fire[data-phase="start"]{border-color:#f08a24;color:var(--anatomy-strong)}
+@keyframes tv-blink{to{visibility:hidden}}
+.tv-throttle{display:inline-flex;align-items:center;gap:8px;letter-spacing:.06em;text-transform:uppercase}
+.tv-throttle input{width:110px;accent-color:#f08a24}
+.tv-throttle output{min-width:4.2ch;text-align:right;color:var(--anatomy-text);font-variant-numeric:tabular-nums}
+.tv-console{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;padding:7px 10px;border:1px solid var(--anatomy-faint);border-radius:6px}
+.tv-seq{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;padding:0;list-style:none;font-size:11px;letter-spacing:.04em}
+.tv-seq li{display:inline-flex;align-items:center;gap:6px;color:var(--anatomy-muted);transition:color .2s}
+.tv-dot{width:6px;height:6px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--anatomy-faint);transition:background .2s,box-shadow .2s}
+.tv-seq li[data-state="done"]{color:var(--anatomy-text)}
+.tv-seq li[data-state="done"] .tv-dot{background:var(--anatomy-mid);box-shadow:none}
+.tv-seq li[data-state="now"]{color:var(--anatomy-strong)}
+.tv-seq li[data-state="now"] .tv-dot{background:#f08a24;box-shadow:0 0 6px #f08a24}
+.tv-seq li[data-step="igniter"][data-state="now"] .tv-dot{background:#3fd27a;box-shadow:0 0 6px #3fd27a}
+.tv-seq li[data-step="chill"][data-state="now"] .tv-dot{background:var(--anatomy-blue);box-shadow:0 0 6px var(--anatomy-blue)}
+.tv-tele{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;font-variant-numeric:tabular-nums;color:var(--anatomy-text)}
+.tv-clock{color:var(--anatomy-strong);min-width:9ch}
+.tv-console[data-phase="off"] .tv-clock{color:var(--anatomy-muted)}
+/* pared caliente: la campana enrojece con el calor (sobre todo abajo, donde se refrigera por radiación) */
+.tv{--tv-glow:#e2561a}
+.iso[data-theme="dark"] .tv{--tv-glow:#f24d12}
+.tv-stage{--tv-heat:0;--tv-s0:var(--anatomy-shade-0);--tv-s1:var(--anatomy-shade-1);--tv-s2:var(--anatomy-shade-2);--tv-s3:var(--anatomy-shade-3);--tv-top:var(--anatomy-top);--tv-paper:var(--anatomy-paper);--tv-face:var(--anatomy-face)}
+.tv-stage :is([data-name="engine.throat"]){--k:0}
+.tv-stage :is([data-name="engine.bell.0"],[data-name="engine.bell.ring.0"]){--k:.12}
+.tv-stage :is([data-name="engine.bell.1"],[data-name="engine.bell.ring.1"]){--k:.3}
+.tv-stage :is([data-name="engine.bell.2"],[data-name="engine.bell.ring.2"]){--k:.62}
+.tv-stage :is([data-name="engine.bell.3"],[data-name="engine.lip"]){--k:1}
+.tv-stage :is([data-name="exh.nozzle"]){--k:.8}
+.tv-stage :is([data-name="engine.throat"],[data-name^="engine.bell."],[data-name="engine.lip"],[data-name="exh.nozzle"]){--h:calc(var(--tv-heat)*var(--k)*52%);--tn-0:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-s0));--tn-1:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-s1));--tn-2:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-s2));--tn-3:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-s3));--tn-4:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-top));--anatomy-shade-0:var(--tn-0);--anatomy-shade-1:var(--tn-1);--anatomy-shade-2:var(--tn-2);--anatomy-shade-3:var(--tn-3);--anatomy-top:var(--tn-4);--anatomy-paper:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-paper));--anatomy-face:color-mix(in srgb,var(--tv-glow) var(--h),var(--tv-face))}
+@media (max-width:560px){.tv-throttle input{width:90px}.tv-console{padding:6px 8px}}

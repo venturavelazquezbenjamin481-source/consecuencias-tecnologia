@@ -86,7 +86,7 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
 4. [~] Auditorías: kit `--audit` en verde; `lines.mjs` 0 en ambos temas; auditoría orbital completa:
    ver `shots/audit-full.txt` (no se versiona) o volver a correr `node build.mjs --audit`.
 5. [ ] Pendiente / ideas: hoja PDF A4 (`anatomy/references/print.md`), bielas laterales con célula de
-   carga que lean la fuerza lateral, humo del escape de la turbina en la pluma, más detalle en las
+   carga que lean la fuerza lateral, más detalle en las
    columnas (bandeja de cables, caja del controlador), luz en las paredes del foso.
 
 ## Anatomía (segunda tanda)
@@ -103,6 +103,25 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
   interior de los 270° que quedan, exterior de los cuartos delanteros, caras cortadas, colector como
   tubo de 270°, flujos animados y una sonda con Mach, presión y temperatura isentrópicas (γ = 1,2,
   pc = 7 MPa, Tc = 3600 K). El sombreado calcula en cada fila los ángulos exactos de cambio de tono.
+
+## Encendido (tercera tanda)
+
+- **Secuencia** (`live.js`, `AT` y `CUT`): orden → purga con N₂ (0–1,2 s, bocanadas por la tobera) →
+  enfriamiento con LOX (niebla fría que cae al foso) → encendedor TEA-TEB a 2,2 s (destello verde) →
+  generador de gas a 2,35 s (escape negro que prende en naranja) → ignición de la cámara a 2,6 s (T0, golpe
+  que hace vibrar la losa) → régimen cuando pc llega al 94 % de la potencia pedida. Apagar durante el arranque
+  aborta; el corte apaga primero el generador, luego la cámara, suelta vapor y purga tres veces.
+  La consola muestra el paso, el reloj T−/T+ y la telemetría (pc, empuje, temperatura de pared estimada).
+- **Potencia** 60–100 % (`MODEL.minThrottle`): deslizador o teclas + y −; la pluma se acorta y los diamantes
+  se acercan con poca presión. El recorrido baja al 70 % durante la segunda vuelta del cono.
+- **Bocanadas** (vapor, hollín, niebla): partículas en JS (máx. 24) que el sombreador integra como gaussianas
+  con ruido (`uPuff`, `uPuffK`); el vapor se ilumina con la pluma. No suben más de ~34 cm por encima de la
+  salida de la tobera. El foso guarda calor (`burn.pit`) y sigue soltando vapor tras el corte.
+- **Pared caliente**: `--tv-heat` en el escenario (sube en ~2,6 s, baja en ~7 s) mezcla `--tv-glow` en los tonos
+  de la campana, más abajo más (`--k` por banda). Funciona sin WebGL.
+- **Sonido**: WebAudio (ruido marrón, rugido, chasquidos, siseo y golpes), apagado hasta que se pulsa Sonido.
+- Ganchos de prueba: `__tv.fire(on)`, `__tv.warp(s)` (avanza la simulación sin dibujar), `__tv.throttle(v)`.
+  Con SwiftShader conviene anular `requestAnimationFrame` antes de capturar.
 
 ## Decisiones que conviene recordar
 
@@ -132,3 +151,4 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
 - 2026-10-26: diseño inicial, kit copiado en `anatomy/`.
 - 2026-10-26: fases 1–3 hechas; auditoría del kit y de líneas en verde.
 - 2026-10-26: despiece, selección por conjuntos, Fig. 2 (corte con sonda isentrópica).
+- 2026-10-26: secuencia de encendido, potencia regulable, vapor y humo, pared caliente, sonido.

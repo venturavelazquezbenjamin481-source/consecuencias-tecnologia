@@ -50,7 +50,7 @@ const EF = G.frameOf([0, 0, ZG], [0, 0, -1], [1, 0, 0], [0, -1, 0]);
 const onE = (deg, r, s) => polar(deg, r, ZG - s);
 
 // Modelo (la verdad que muestran las lecturas)
-export const MODEL = { thrustKN: 400, limit: 6, rate: 20, omega: 14, zeta: 0.8, leverM: 15, pcMPa: 7, tcK: 3600 };
+export const MODEL = { thrustKN: 400, limit: 6, rate: 20, omega: 14, zeta: 0.8, leverM: 15, pcMPa: 7, tcK: 3600, minThrottle: 60 };
 
 // Campana: r(s) cóncava (cuadrática), de la garganta a la salida
 const BELL_S = [98, 214];
@@ -630,11 +630,12 @@ const corners2 = `<div class="iso-plate-corners" aria-hidden="true"><span class=
 const caption2 = `Dentro del motor. El oxígeno (azul) llena la cúpula y baja por los orificios de la placa; el queroseno (rojo) entra por el colector de la campana y sube por los canales de la pared, enfriándola, hasta el anillo del inyector. Arden a ${MODEL.pcMPa} MPa y unos ${MODEL.tcK} K. El gas (blanco) acelera: en la garganta, de ${(2 * PROF.throatR).toFixed(0)} cm, llega a Mach 1; en la salida, con relación de áreas ε ≈ ${EPS_GAS.toFixed(0)}, a Mach ${MACH_EXIT.toFixed(1)}, a ${(MODEL.pcMPa * pOf(MACH_EXIT) * 1000).toFixed(0)} kPa y ${(MODEL.tcK * tOf(MACH_EXIT)).toFixed(0)} K. Los valores salen de las relaciones isentrópicas con γ = ${GAMMA}.`;
 const fig2 = `<figure class="iso-figure tv tv-fig2"><div class="iso-plate">${corners2}<div class="iso-stage tv-stage tv-cut" tabindex="0" role="application" aria-label="Corte de la cámara de empuje: mueve el puntero o usa las flechas arriba y abajo para recorrer el eje">${cutSvg}</div></div>${k.plateHtml({ fig: "", keys: [{ mark: "blue", label: "Oxígeno líquido" }, { mark: "red", label: "Queroseno por los canales de la pared" }, { mark: "lit", label: "Gas de combustión" }], caption: caption2, body: "" }).replace(/^[\s\S]*?(<figcaption)/, "$1").replace(/<\/figure>$/, "")}</figure>`;
 
+const SEQ = [["purge", "Purga N₂"], ["chill", "Enfriamiento"], ["igniter", "Encendedor"], ["gg", "Generador"], ["main", "Cámara"], ["full", "Régimen"], ["cut", "Corte"]];
 const DATA = {
   W, H, P, model: MODEL, turn: out.data,
   cut: { W: W2, H: H2, P: P2, Z0, gas: GAS, s0: 14, ds: 0.5, throatS: PROF.throatS, throatR: PROF.throatR, gamma: GAMMA, exitS: BELL_S[1] },
   explode: EXPLODE, assemblies: ASSEMBLIES.map(({ id, name, text }) => ({ id, name, text })),
-  U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R, pit: [PIT.x, PIT.y, PIT.x + PIT.w, PIT.y + PIT.d], pitD: PIT_D, deck: [DECK.x, DECK.y, DECK.x + DECK.w, DECK.y + DECK.d],
+  U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R, ggExit: G.add3(EXH_END, [0, 0, -10]), ggR: 7.4, seq: SEQ.map(([id]) => id), pit: [PIT.x, PIT.y, PIT.x + PIT.w, PIT.y + PIT.d], pitD: PIT_D, deck: [DECK.x, DECK.y, DECK.x + DECK.w, DECK.y + DECK.d],
   camera: glCamera(P),
 };
 // La biblioteca de tornos del kit, envuelta para no chocar con nombres de la página
@@ -647,7 +648,7 @@ const SECTION_SCRIPT = ["GAMMA", "machOf", "pOf", "tOf"].map((name) => (name ===
 const CSS = out.css + "\n" + readFileSync(join(HERE, "tvc.css"), "utf8") + "\n" + FOCUS_CSS;
 const LIVE = readFileSync(join(HERE, "live.js"), "utf8").replace("__DATA__", JSON.stringify(DATA));
 const corners = `<div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 1</span><span class="iso-plate-corner" data-corner="title">Empuje vectorial · banco TVC-1</span><span class="iso-plate-corner" data-corner="hint">Mueve el puntero para apuntar la tobera</span><span class="iso-plate-corner" data-corner="readout" data-readout>δ 0.0° · frío</span></div>`;
-const caption = `Un cohete no tiene timón: se gobierna inclinando su motor. Este motor de ${MODEL.thrustKN} kN cuelga de un cardán de dos ejes, y dos actuadores electromecánicos, a 90° entre sí, lo empujan por debajo del cardán; la carrera que marca la lectura sale de la distancia real entre sus dos rótulas. Inclinar el empuje F un ángulo δ crea una fuerza lateral F·sen δ: a 6°, unos ${(MODEL.thrustKN * Math.sin(6 * DEG)).toFixed(0)} kN. Aplicada ${MODEL.leverM} m por debajo del centro de masa, eso es un par de ${((MODEL.thrustKN * Math.sin(6 * DEG) * MODEL.leverM) / 1000).toFixed(2)} MN·m que hace girar al vehículo. Los fuelles de las líneas de oxígeno y queroseno se doblan para seguir al motor. La I enciende y apaga.`;
+const caption = `Un cohete no tiene timón: se gobierna inclinando su motor. Este motor de ${MODEL.thrustKN} kN cuelga de un cardán de dos ejes, y dos actuadores electromecánicos, a 90° entre sí, lo empujan por debajo del cardán; la carrera que marca la lectura sale de la distancia real entre sus dos rótulas. Inclinar el empuje F un ángulo δ crea una fuerza lateral F·sen δ: a 6°, unos ${(MODEL.thrustKN * Math.sin(6 * DEG)).toFixed(0)} kN. Aplicada ${MODEL.leverM} m por debajo del centro de masa, eso es un par de ${((MODEL.thrustKN * Math.sin(6 * DEG) * MODEL.leverM) / 1000).toFixed(2)} MN·m que hace girar al vehículo. Los fuelles de las líneas de oxígeno y queroseno se doblan para seguir al motor. El botón Encender corre la secuencia real de un banco: purga con nitrógeno, enfriamiento con oxígeno líquido, encendedor pirofórico (la llama verde), arranque del generador de gas y de la turbobomba, ignición de la cámara y régimen; la potencia se regula entre el ${MODEL.minThrottle} y el 100 %. La I enciende y apaga; + y − regulan.`;
 const legend = k.plateHtml({
   fig: "",
   keys: [
@@ -658,7 +659,9 @@ const legend = k.plateHtml({
   caption,
   body: "",
 }).replace(/^[\s\S]*?(<figcaption)/, "$1").replace(/<\/figure>$/, "");
-const controls = `<div class="tv-controls"><button type="button" class="tv-fire" data-fire><span class="tv-lamp" aria-hidden="true"></span><span data-fire-label>Encender</span></button><button type="button" class="tv-fire" data-apart><span class="tv-lamp" aria-hidden="true"></span><span data-apart-label>Despiezar</span></button><span class="tv-live" aria-live="polite" data-say></span></div>`;
+// Consola del banco: orden de encendido, potencia, sonido y la secuencia de arranque paso a paso
+const lampButton = (attr, label, extra = "") => `<button type="button" class="tv-fire" ${attr}${extra}><span class="tv-lamp" aria-hidden="true"></span><span ${attr}-label>${label}</span></button>`;
+const controls = `<div class="tv-controls"><div class="tv-row">${lampButton("data-fire", "Encender")}${lampButton("data-apart", "Despiezar")}${lampButton("data-sound", "Sonido", ' aria-pressed="false"')}<label class="tv-throttle"><span>Potencia</span><input type="range" min="${MODEL.minThrottle}" max="100" step="1" value="100" data-throttle aria-label="Potencia del motor en porcentaje del empuje nominal"><output data-throttle-out>100 %</output></label><span class="tv-live" aria-live="polite" data-say></span></div><div class="tv-console" data-console><ol class="tv-seq" aria-label="Secuencia de arranque y corte">${SEQ.map(([id, label]) => `<li data-step="${id}"><span class="tv-dot" aria-hidden="true"></span>${label}</li>`).join("")}</ol><div class="tv-tele"><span class="tv-clock" data-clock>T− —</span><span data-tele>pc 0.0 MPa · F 0 kN · frío</span></div></div></div>`;
 const PARTS = ASSEMBLIES.map((a, i) => `<button type="button" class="tv-part" data-part="${a.id}"><span class="tv-num">${String(i + 1).padStart(2, "0")}</span>${a.name}</button>`).join("");
 const INFO = `<div class="tv-info" data-info aria-live="polite"><span class="tv-info-title" data-info-title>Anatomía</span><span class="tv-info-text" data-info-text>Pasa por un conjunto de la lista, o pulsa su número, para despiezar el motor y resaltarlo. D despieza o monta; Esc vuelve.</span></div>`;
 const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div><div class="tv-anatomy"><div class="tv-parts" role="group" aria-label="Conjuntos del motor">${PARTS}</div>${INFO}</div>${legend}</figure>${fig2}`;
