@@ -549,9 +549,19 @@ const ACT_SCRIPT = readFileSync(join(HERE, "actuators.mjs"), "utf8").replace(/^e
 const CSS = out.css + "\n" + readFileSync(join(HERE, "tvc.css"), "utf8");
 const LIVE = readFileSync(join(HERE, "live.js"), "utf8").replace("__DATA__", JSON.stringify(DATA));
 const corners = `<div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 1</span><span class="iso-plate-corner" data-corner="title">Empuje vectorial · banco TVC-1</span><span class="iso-plate-corner" data-corner="hint">Mueve el puntero para apuntar la tobera</span><span class="iso-plate-corner" data-corner="readout" data-readout>δ 0.0° · frío</span></div>`;
-const caption = "Un cohete no tiene timón: se gobierna inclinando su motor. El motor cuelga de un cardán de dos ejes y dos actuadores, a 90° entre sí, lo empujan por debajo del cardán. Inclinar el empuje F un ángulo δ crea una fuerza lateral F·sen δ que, aplicada lejos del centro de masa, hace girar al vehículo.";
+const caption = `Un cohete no tiene timón: se gobierna inclinando su motor. Este motor de ${MODEL.thrustKN} kN cuelga de un cardán de dos ejes, y dos actuadores electromecánicos, a 90° entre sí, lo empujan por debajo del cardán; la carrera que marca la lectura sale de la distancia real entre sus dos rótulas. Inclinar el empuje F un ángulo δ crea una fuerza lateral F·sen δ: a 6°, unos ${(MODEL.thrustKN * Math.sin(6 * DEG)).toFixed(0)} kN. Aplicada ${MODEL.leverM} m por debajo del centro de masa, eso es un par de ${((MODEL.thrustKN * Math.sin(6 * DEG) * MODEL.leverM) / 1000).toFixed(2)} MN·m que hace girar al vehículo. Los fuelles de las líneas de oxígeno y queroseno se doblan para seguir al motor. La I enciende y apaga.`;
+const legend = k.plateHtml({
+  fig: "",
+  keys: [
+    { mark: "lit", label: "Vástagos de los actuadores: su carrera inclina el motor" },
+    { mark: "raised", label: "Motor, turbobomba y conductos: giran juntos sobre el cardán" },
+    { mark: "flat", label: "Pórtico, placa de empuje y foso: fijos" },
+  ],
+  caption,
+  body: "",
+}).replace(/^[\s\S]*?(<figcaption)/, "$1").replace(/<\/figure>$/, "");
 const controls = `<div class="tv-controls"><button type="button" class="tv-fire" data-fire><span class="tv-lamp" aria-hidden="true"></span><span data-fire-label>Encender</span></button><span class="tv-live" aria-live="polite" data-say></span></div>`;
-const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div><figcaption class="iso-legend"><span class="iso-caption">${caption}</span></figcaption></figure>`;
+const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div>${legend}</figure>`;
 const page = k.pageHtml({ title: "Empuje vectorial", theme: THEME, body, script: kitScript() + G_SCRIPT + ACT_SCRIPT + turnScript() + glScript() + (verify ? `window.__isoVerify = ${JSON.stringify(out.verify)};\n` : "") + LIVE, width: 940 });
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const name = `motor-vectorial${verify ? "-verify" : ""}${THEME === "light" ? "-light" : ""}.html`;

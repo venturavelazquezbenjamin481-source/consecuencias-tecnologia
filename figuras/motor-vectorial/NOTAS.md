@@ -78,12 +78,30 @@ con tobera propia, conductos de descarga con codos, sensores con bridas.
 
 ## Fases y estado
 
-1. [ ] Banco estático + motor 3D con cardán + actuadores por fotograma + interacción + lecturas.
-2. [ ] Plomería del motor: turbobomba, generador de gas, conductos, colector, fuelles.
-3. [ ] Pluma WebGL (oscuro y claro) + respaldo sin WebGL.
-4. [ ] Auditorías: kit `--audit`, orbital 3D, `lines.mjs`, primeros planos 4× en ambos temas.
-5. [ ] Pulido, móvil, hoja PDF A4 (opcional).
+1. [x] Banco estático + motor 3D con cardán + actuadores por fotograma + interacción + lecturas.
+2. [x] Plomería: turbobomba, generador de gas, conducto de LOX, escape de turbina, colector de
+   combustible con T, entradas con codo de bola, fuelles por fotograma, sensores.
+3. [x] Pluma WebGL (oscuro: aditiva con diamantes de choque; claro: tintas resueltas sobre papel),
+   luz en la losa y el foso, respaldo SVG sin WebGL.
+4. [~] Auditorías: kit `--audit` en verde; `lines.mjs` 0 en ambos temas; auditoría orbital completa:
+   ver `shots/audit-full.txt` (no se versiona) o volver a correr `node build.mjs --audit`.
+5. [ ] Pendiente / ideas: hoja PDF A4 (`anatomy/references/print.md`), bielas laterales con célula de
+   carga que lean la fuerza lateral, humo del escape de la turbina en la pluma, más detalle en las
+   columnas (bandeja de cables, caja del controlador), luz en las paredes del foso.
+
+## Decisiones que conviene recordar
+
+- Los tubos vivos solo pueden ir rectos (verticales u horizontales); los cambios de dirección van
+  dentro de bolas con planos. Un tubo que acaba sobre un cilindro necesita radio pequeño (flecha de
+  la llanta < 0.15) o una bola tangente al cuerpo como asiento (así están el escape y la entrada de
+  combustible).
+- Nada fijo puede intercalarse en altura con la capa viva: las líneas de alimentación terminan por
+  encima de z = 388 y el fuelle cubre el resto.
+- El texto accesible usa `data-say`: `data-live` es el atributo del motor 3D y lo borraba.
+- `window.__tv.set(p, q, pc)` fija ángulos y potencia para las capturas (el navegador sin GPU es
+  lento y las envolventes avanzan a cámara lenta).
 
 ## Registro
 
 - 2026-10-26: diseño inicial, kit copiado en `anatomy/`.
+- 2026-10-26: fases 1–3 hechas; auditoría del kit y de líneas en verde.
