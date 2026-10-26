@@ -56,7 +56,8 @@ const hold = () => {
   clearTimeout(idle);
   idle = setTimeout(() => {
     touring = !still.matches;
-    tourClock = 0;
+    // el recorrido retoma desde donde coincide con el motor: encendido o apagado
+    tourClock = burn.on ? 1 : 0;
     run();
   }, 6000);
 };
@@ -161,7 +162,7 @@ void main(){
   vec3 hitP=uExit+d*((uExit.z+PITD)/max(-d.z,.2));
   float rp=length(pf.xy-hitP.xy);
   float floorLight=(onDeck*exp(-pow(rd/110.,2.))*.55+onPitFloor*exp(-pow(rp/60.,2.))*1.2)*pc;
-  vec3 dark=hot*2.1*pc+vec3(1.,.9,.68)*core*1.1*pc+vec3(1.,.97,.9)*diamonds*4.5*pc*smoothstep(.5,.95,pc)+vec3(1.,.5,.15)*floorLight*.5+vec3(1.,.8,.6)*uFlash*exp(-pow(length(vb-project(uExit))/(R0*uK*1.4),2.))*.6;
+  vec3 dark=hot*2.1*pc+vec3(1.,.9,.68)*core*1.1*pc+vec3(1.,.97,.9)*diamonds*4.5*pc*smoothstep(.5,.95,pc)+vec3(1.,.5,.15)*floorLight*.5+vec3(1.,.82,.6)*uFlash*exp(-pow(length(vb-project(uExit+d*R0*.35))/(R0*uK*.75),2.))*.45;
   dark=tonemap(dark,1.);
   float m=max(dark.r,max(dark.g,dark.b));
   vec4 darkInk=vec4(dark,m);
@@ -211,7 +212,7 @@ function paintFallback() {
 function paintPlume() {
   if (!plume) return paintFallback();
   const pc = burn.pc.x;
-  const flash = burn.flash >= 0 && !still.matches ? burst(burn.flash, 0.06, 0.12) : 0;
+  const flash = burn.flash >= 0 && !still.matches ? burst(burn.flash, 0.06, 0.2) : 0;
   if (pc < 1e-3 && flash < 1e-3) {
     if (plumeLive) plume.clear();
     plumeLive = false;
@@ -279,7 +280,7 @@ function tick(now) {
     } else moving = true;
   }
   const pcBefore = burn.pc.x;
-  const burning = settle(burn.pc, burn.on ? 1 : 0, dt, burn.on ? 0.35 : 0.22, calm);
+  const burning = settle(burn.pc, burn.on ? 1 : 0, dt, burn.on ? 0.18 : 0.22, calm);
   if (burn.flash >= 0) burn.flash += dt;
   if (burn.flash > 1.5) burn.flash = -1;
   if (moving || burning || pcBefore !== burn.pc.x || !drawn || drawn[0] !== servo.p.x || drawn[1] !== servo.q.x) draw();
