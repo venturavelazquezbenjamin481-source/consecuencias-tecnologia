@@ -5,3 +5,11 @@
 .tv-stage{touch-action:none;cursor:crosshair;outline:none;border-radius:8px}
 .tv-stage:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:6px}
 .tv-plume{display:block}
+.tv-stage>.tv-plume{mix-blend-mode:normal}
+.iso[data-theme="dark"] .tv-stage>.tv-plume{mix-blend-mode:screen}
+.tv-controls{display:flex;align-items:center;gap:14px;margin-top:6px;font:12px/1.4 var(--anatomy-mono,ui-monospace,monospace);color:var(--anatomy-muted)}
+.tv-fire{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--anatomy-faint);border-radius:6px;background:transparent;color:var(--anatomy-text);font:inherit;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.tv-fire:hover{border-color:var(--anatomy-muted)}
+.tv-fire:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:3px}
+.tv-lamp{width:8px;height:8px;border-radius:50%;background:var(--anatomy-faint);transition:background .3s,box-shadow .3s}
+.tv-fire[data-on] .tv-lamp{background:#f08a24;box-shadow:0 0 6px #f08a24}

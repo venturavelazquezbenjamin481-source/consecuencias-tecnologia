@@ -387,6 +387,27 @@ duct("fuel.inlet.stub", [TP_C[0] + FIN_DIR[0] * 12, TP_C[1] + FIN_DIR[1] * 12, Z
 const FIN_TOP = G.add3(finUp, [0, 0, 3]);
 duct("fuel.inlet.riser", finUp, FIN_TOP, 2.6, { ends: [false, false] });
 T.round({ name: "fuel.inlet.flange", ...EN, F: frameOn(FIN_TOP, [0, 0, 1], [1, 0, 0]), s0: 0, s1: 1.6, r: 5.4, tone: "mid", details: { bolts: [{ s: 1.6, r: 4.4, count: 6, size: 0.38 }] } });
+// Generador de gas: cápsula junto a la turbina, con su salida a la turbina y un encendedor
+const GG_DIR = dir(TP_AZ - 110);
+const GG_C = [TP_C[0] + GG_DIR[0] * 26, TP_C[1] + GG_DIR[1] * 26];
+const GGF = G.frameOf([GG_C[0], GG_C[1], ZG], [0, 0, -1], [1, 0, 0], [0, -1, 0]);
+T.round({ name: "gg.body", ...EN, F: GGF, s0: 31, s1: 50, r: 5.5, ends: ["dome", "dome"], tone: "hi", crease: "lo", material: "steel", details: { seams: [40.5] } });
+T.round({ name: "gg.igniter", ...EN, F: GGF, s0: 31 - 5.5 - 3, s1: 31 - 5.5, r: 1.4, tone: "mid" });
+{
+  const from = [GG_C[0] - GG_DIR[0] * 5.5, GG_C[1] - GG_DIR[1] * 5.5, ZG - 46];
+  const to = [TP_C[0] + GG_DIR[0] * 15, TP_C[1] + GG_DIR[1] * 15, ZG - 46];
+  duct("gg.outlet", from, to, 2, { flange: 1.5, thick: 0.9 });
+}
+// Transductores de presión sobre la cámara y la turbobomba
+for (const [name, az, s, r] of [["sensor.pc", 30, 60, 22], ["sensor.pc2", -60, 42, 22], ["sensor.tp", TP_AZ + 60, 64, 12]]) {
+  const host = name === "sensor.tp" ? [TP_C[0], TP_C[1]] : [0, 0];
+  const out = dir(az);
+  const base = [host[0] + out[0] * r, host[1] + out[1] * r, ZG - s];
+  const F = frameOn(base, out, Z);
+  T.round({ name: `${name}.boss`, ...EN, F, s0: 0, s1: 2.2, r: 2, tone: "mid" });
+  T.round({ name: `${name}.body`, ...EN, F, s0: 2.2, s1: 8, r: 2.6, tone: "hi", details: { seams: [3.4] } });
+  T.round({ name: `${name}.cap`, ...EN, F, s0: 8, s1: 9.4, r: 1.8, tone: "mid" });
+}
 export const FEEDS = {
   lox: { top: [TP_C[0], TP_C[1], 400], bottom: [TP_C[0], TP_C[1], ZG - 16] },
   fuel: { top: [FIN_TOP[0], FIN_TOP[1], 396], bottom: [FIN_TOP[0], FIN_TOP[1], FIN_TOP[2] + 1.6] },
@@ -428,7 +449,7 @@ const stage = `<div class="iso-stage iso-turn tv-stage" tabindex="0" role="appli
 
 const DATA = {
   W, H, P, model: MODEL, turn: out.data,
-  U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R,
+  U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R, pit: [PIT.x, PIT.y, PIT.x + PIT.w, PIT.y + PIT.d], pitD: PIT_D, deck: [DECK.x, DECK.y, DECK.x + DECK.w, DECK.y + DECK.d],
   camera: glCamera(P),
 };
 // La biblioteca de tornos del kit, envuelta para no chocar con nombres de la página
@@ -440,7 +461,8 @@ const CSS = out.css + "\n" + readFileSync(join(HERE, "tvc.css"), "utf8");
 const LIVE = readFileSync(join(HERE, "live.js"), "utf8").replace("__DATA__", JSON.stringify(DATA));
 const corners = `<div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 1</span><span class="iso-plate-corner" data-corner="title">Empuje vectorial · banco TVC-1</span><span class="iso-plate-corner" data-corner="hint">Mueve el puntero para apuntar la tobera</span><span class="iso-plate-corner" data-corner="readout" data-readout>δ 0.0° · frío</span></div>`;
 const caption = "Un cohete no tiene timón: se gobierna inclinando su motor. El motor cuelga de un cardán de dos ejes y dos actuadores, a 90° entre sí, lo empujan por debajo del cardán. Inclinar el empuje F un ángulo δ crea una fuerza lateral F·sen δ que, aplicada lejos del centro de masa, hace girar al vehículo.";
-const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}</div><figcaption class="iso-legend"><span class="iso-caption">${caption}</span></figcaption></figure>`;
+const controls = `<div class="tv-controls"><button type="button" class="tv-fire" data-fire><span class="tv-lamp" aria-hidden="true"></span><span data-fire-label>Encender</span></button><span class="tv-live" aria-live="polite" data-say></span></div>`;
+const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div><figcaption class="iso-legend"><span class="iso-caption">${caption}</span></figcaption></figure>`;
 const page = k.pageHtml({ title: "Empuje vectorial", theme: THEME, body, script: kitScript() + G_SCRIPT + ACT_SCRIPT + turnScript() + glScript() + (verify ? `window.__isoVerify = ${JSON.stringify(out.verify)};\n` : "") + LIVE, width: 940 });
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const name = `motor-vectorial${verify ? "-verify" : ""}${THEME === "light" ? "-light" : ""}.html`;
