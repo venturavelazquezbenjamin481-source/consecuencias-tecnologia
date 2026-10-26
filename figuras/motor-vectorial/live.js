@@ -167,17 +167,16 @@ void main(){
   vec4 darkInk=vec4(dark,m);
   // papel: cuerpo naranja saturado, núcleo pálido junto a la tobera, hollín gris en los bordes
   float e=1.-exp(-2.2*(length(hot)*.9+core*.6)*pc);
-  vec3 seen=mix(vec3(1.),vec3(1.,.62,.16),smoothstep(.05,.45,e));
-  seen=mix(seen,vec3(1.,.88,.42),smoothstep(.45,.8,e));
+  vec3 seen=mix(vec3(1.),vec3(1.,.6,.14),smoothstep(0.,.42,e));
+  seen=mix(seen,vec3(1.,.84,.34),smoothstep(.4,.78,e));
   seen=mix(seen,vec3(1.,.98,.9),smoothstep(.7,.95,core*pc));
+  float lens=min(diamonds*pc*smoothstep(.5,.95,pc),1.);
+  seen=mix(seen,vec3(1.,.97,.86),lens*.75);
   vec4 flame=inkFor(seen,.9*smoothstep(.55,.9,e));
   float sootA=(1.-exp(-1.2*length(soot)*pc))*.45;
   vec4 smoke=vec4(vec3(.42,.38,.35)*sootA,sootA);
-  vec4 shock=inkFor(vec3(1.,.97,.86),0.)+vec4(vec3(.0),.0);
-  shock=vec4(vec3(.06,.08,.2)*min(diamonds*pc*smoothstep(.5,.95,pc),1.)*.8,min(diamonds*pc*smoothstep(.5,.95,pc),1.)*.25);
-  float tintA=floorLight*.42;
-  vec4 tint=vec4(vec3(0.,.28,.62)*tintA,tintA);
-  vec4 lightInk=over(shock,over(flame,over(smoke,tint)));
+  vec4 tint=inkFor(mix(vec3(1.),vec3(1.,.74,.46),min(floorLight*.75,.7)),0.);
+  vec4 lightInk=over(flame,over(smoke,tint));
   vec4 ink=mix(darkInk,lightInk,uLight);
   ink.rgb=min(ink.rgb,vec3(ink.a));
   float nz=(hash12(gl_FragCoord.xy+fract(T*.61)*91.)+hash12(gl_FragCoord.yx*1.37+fract(T*.37)*57.)-1.)/255.;
