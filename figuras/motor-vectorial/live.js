@@ -185,8 +185,31 @@ void main(){
 const plume = glLayer({ canvas: stage.querySelector(".tv-plume"), fragment: PLUME, view: [DATA.W, DATA.H], camera: DATA.camera, uniforms: ["uExit", "uDir", "uPc", "uFlash"], fixed: { uLight: LIGHT } });
 if (plume) stage.setAttribute("data-gl", "");
 let plumeLive = false;
+// Respaldo sin WebGL: la silueta de la pluma con un degradado, en el mismo eje
+const fbPath = stage.querySelector(".tv-fb-plume");
+const fbGrad = stage.querySelector("#tv-fb");
+function paintFallback() {
+  const pc = burn.pc.x;
+  if (pc < 1e-3) {
+    fbPath.setAttribute("d", "");
+    return;
+  }
+  const exit = controller.anchor("yaw", EXIT, [0, 0, -1]);
+  const d = exit.direction;
+  const F = G.frameAlong(exit.world, d);
+  const pts = [];
+  for (const [s, r] of [[0, DATA.exitR * 0.98], [60, DATA.exitR * 0.9 + 3], [120, DATA.exitR * 0.88 + 9]]) for (let i = 0; i < 24; i++) pts.push(iso(G.pointOf(F, s * pc, r, (i / 24) * Math.PI * 2), P));
+  fbPath.setAttribute("d", pathOf(G.hullOf(pts), true));
+  const a = iso(exit.world, P);
+  const b = iso(G.add3(exit.world, G.mul3(d, 125 * pc)), P);
+  fbGrad.setAttribute("x1", a[0].toFixed(1));
+  fbGrad.setAttribute("y1", a[1].toFixed(1));
+  fbGrad.setAttribute("x2", b[0].toFixed(1));
+  fbGrad.setAttribute("y2", b[1].toFixed(1));
+  fbPath.style.opacity = String(pc);
+}
 function paintPlume() {
-  if (!plume) return;
+  if (!plume) return paintFallback();
   const pc = burn.pc.x;
   const flash = burn.flash >= 0 && !still.matches ? burst(burn.flash, 0.06, 0.12) : 0;
   if (pc < 1e-3 && flash < 1e-3) {

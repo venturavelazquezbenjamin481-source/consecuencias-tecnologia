@@ -138,7 +138,7 @@ function pitSvg() {
   const floor = k.onTop(ring, -PIT_D, P, true);
   const grate = [];
   for (let x = PIT.x + 13; x < PIT.x + PIT.w - 4; x += 13) grate.push(k.lineOnTop([x, PIT.y], [x, PIT.y + PIT.d], -PIT_D, P));
-  return `<defs><clipPath id="tv-pit"><path d="${hole}"/></clipPath></defs><g clip-path="url(#tv-pit)"><path class="tv-void" d="${hole}"/><path class="tv-pit-floor" d="${floor}"/>${Ln(grate.join(""), { tone: "faint" })}${walls.map((list, shade) => (list.length ? `<path class="iso-shade tv-pit-wall" data-shade="${shade}" d="${list.join("")}"/>` : "")).join("")}</g>${Ln(hole, { tone: "mid" })}`;
+  return `<defs><clipPath id="tv-pit"><path d="${hole}"/></clipPath></defs><g clip-path="url(#tv-pit)"><path class="tv-void" d="${hole}"/><path class="tv-pit-floor" d="${floor}"/>${Ln(grate.join(""), { tone: "faint" })}${walls.map((list, shade) => (list.length ? `<path class="iso-shade tv-pit-wall" data-shade="${shade}" d="${list.join("")}"/>` : "")).join("")}${Ln(floor, { tone: "lo" })}</g>${Ln(hole, { tone: "mid" })}`;
 }
 
 // Ángulo de acero alrededor del foso y aro de agua
@@ -163,7 +163,7 @@ function deckFurniture() {
   const LABEL = { x: 82, y: 50, w: 46, d: 16, r: 1.6 };
   const svg = S(k.slabOf(LABEL, 0, 1, P, 3, 0.4), { tone: "mid" }) + Ln(k.planOutline(k.insetPlan(LABEL, 1.6), 1, P, 3), { tone: "faint" }) + k.faceTextSvg(k.topMatrix([LABEL.x + 5, LABEL.y + 7], 1, P, "x"), "TVC-1 · 400 kN", { size: 4, tone: "lo" }) + Ln([0, 1].map((row) => k.lineOnTop([LABEL.x + 5, LABEL.y + 10 + row * 2.2], [LABEL.x + (row ? 30 : 40), LABEL.y + 10 + row * 2.2], 1, P)).join(""), { tone: "lo", free: true }) + Dots([at([LABEL.x + 2.6, LABEL.y + LABEL.d / 2, 1]), at([LABEL.x + LABEL.w - 2.6, LABEL.y + LABEL.d / 2, 1])], { size: 0.45 });
   put("back", "stand.label", [LABEL.x + 25, LABEL.y + 8, 0], svg, [A.slab(LABEL, 0, 1)], -20);
-  const STRIP = { x: -120, y: DECK.y + DECK.d - 14, w: 180, d: 8, r: 1 };
+  const STRIP = { x: -84, y: DECK.y + DECK.d - 14, w: 180, d: 8, r: 1 };
   const t = k.topTicks(STRIP.x + 4, STRIP.x + STRIP.w - 4, 4, 5, STRIP.y + 1, 0.8, [2.2, 4.4], P);
   put("back", "stand.strip", [STRIP.x + 100, STRIP.y + 4, 0], S(k.slabOf(STRIP, 0, 0.8, P, 3), { tone: "lo", crease: "none" }) + Ln(t.minor, { tone: "lo" }) + Ln(t.major, { tone: "mid" }) + Dots([at([STRIP.x + 2.2, STRIP.y + 4, 0.8]), at([STRIP.x + STRIP.w - 2.2, STRIP.y + 4, 0.8])], { size: 0.45 }), [A.slab(STRIP, 0, 0.8)], -20);
 }
@@ -223,15 +223,22 @@ function thrustCone() {
   const block = S(k.cylinder(0, 0, BLOCK_R, BLOCK_Z[0], BLOCK_Z[1] - BLOCK_Z[0], P, 64, 0.8), { tone: "mid", inner: Ln(k.sideArc(0, 0, BLOCK_R, BLOCK_Z[0] + 4, P, 48), { tone: "faint" }) }) + Dots(G.dotsOf(G.frameOf([0, 0, 0], [0, 0, 1], [1, 0, 0], [0, 1, 0]), BLOCK_Z[0] + 8, BLOCK_R, 16, P, { fade: FADE }), { size: 0.42 });
   put("front", "stand.gimbal-block", [0, 0, BLOCK_Z[0]], block, [A.cylinder(0, 0, BLOCK_R, BLOCK_Z[0], BLOCK_Z[1] - BLOCK_Z[0])], 20);
   for (const deg of [AZIMUTH, AZIMUTH + 90, AZIMUTH + 180, AZIMUTH - 90]) {
-    const top = polar(deg, 56, PLATE_Z[0]);
-    const low = polar(deg, BLOCK_R - 5, BLOCK_Z[1]);
+    // puntal con rótula en cada extremo: espárrago, bola y barra (llanta sobre la esfera)
+    const BALL = 4;
+    const STUD = 2.4;
+    const ROD = 2.6;
+    const seat = Math.sqrt(BALL ** 2 - STUD ** 2);
+    const top = polar(deg, 56, PLATE_Z[0] - 2 - seat);
+    const low = polar(deg, BLOCK_R - 6, BLOCK_Z[1] + 2 + seat);
     const axis = G.unit3(G.sub3(top, low));
     const F = G.frameAlong(low, axis);
     const length = G.len3(G.sub3(top, low));
+    const end = Math.sqrt(BALL ** 2 - ROD ** 2);
     const name = `stand.strut.${deg}`;
-    const pad = 3.4;
-    const svg = S(G.disc(0, 3, 4.6, F, P), { tone: "mid" }) + S(G.disc(3, length - 3, pad, F, P), { tone: "mid", inner: Ln(G.arcOf(F, length / 2, pad, P), { tone: "faint" }) }) + S(G.disc(length - 3, length, 4.6, F, P), { tone: "mid" });
-    put("front", name, G.lerp3(low, top, 0.5), svg, [A.disc(F, 0, length, 4.6)], 30);
+    const ballTop = A.ball(top, BALL, { name: `${name}.ball-top` });
+    const ballLow = A.ball(low, BALL, { name: `${name}.ball-low` });
+    const svg = S(k.cylinder(low[0], low[1], STUD, BLOCK_Z[1], 2 + 0.01, P, 20), { tone: "mid" }) + S(G.disc(end, length - end, ROD, F, P), { tone: "mid", inner: Ln(G.arcOf(F, length / 2, ROD, P), { tone: "faint" }) }) + S(G.sphereOf(low, BALL, P), { tone: "hi" }) + S(G.sphereOf(top, BALL, P), { tone: "hi" }) + S(k.cylinder(top[0], top[1], STUD, top[2] + seat, PLATE_Z[0] - top[2] - seat, P, 20), { tone: "mid" });
+    put("front", name, G.lerp3(low, top, 0.5), svg, [ballTop, ballLow, A.disc(F, end, length - end, ROD, { seated: true, cut: [ballTop, ballLow] }), A.cylinder(low[0], low[1], STUD, BLOCK_Z[1], 2, { seated: true, cut: [ballLow] }), A.cylinder(top[0], top[1], STUD, top[2] + seat, PLATE_Z[0] - top[2] - seat, { seated: true, cut: [ballTop] })], 30);
   }
 }
 
@@ -242,7 +249,7 @@ function upperBrackets() {
     const plan = { x: u[0] - 7, y: u[1] - 7, w: 14, d: 14, r: 1.4 };
     const stemFrom = u[2] + Math.sqrt(ACT.ball ** 2 - 2.6 ** 2);
     const svg = S(k.slabOf(plan, PLATE_Z[0] - 4, 4, P, 3, 0.5), { tone: "mid" }) + S(k.cylinder(u[0], u[1], 2.6, stemFrom, PLATE_Z[0] - 4 - stemFrom, P, 20), { tone: "mid", crease: "none" }) + S(G.sphereOf(u, ACT.ball, P), { tone: "hi" }) + Dots(k.corners(plan, 2.4).map(([x, y]) => at([x, y, PLATE_Z[0] - 4])), { size: 0.4 });
-    put("mid", `stand.bracket.${id}`, u, svg, [A.slab(plan, PLATE_Z[0] - 4, 4), A.cylinder(u[0], u[1], 2.6, stemFrom, PLATE_Z[0] - 4 - stemFrom), A.ball(u, ACT.ball)], 60);
+    put("mid", `stand.bracket.${id}`, u, svg, (() => { const ball = A.ball(u, ACT.ball); return [A.slab(plan, PLATE_Z[0] - 4, 4), A.cylinder(u[0], u[1], 2.6, stemFrom, PLATE_Z[0] - 4 - stemFrom, { seated: true, cut: [ball] }), ball]; })(), 60);
   }
 }
 
@@ -337,7 +344,7 @@ function duct(name, from, to, r, { flange = 1.5, thick = 1.2, ends = [true, true
   const gaps = [...extra];
   if (ends[0]) gaps.push([0, thick]);
   if (ends[1]) gaps.push([length - thick, length]);
-  T.tube({ name, ...EN, route: [from, to], r, chunk, gaps, tone: "hi" });
+  T.tube({ name, ...EN, route: [from, to], r, chunk, gaps, tone: "hi", limp: false });
   [0, 1].forEach((end) => {
     if (!ends[end]) return;
     const centre = end ? G.add3(to, G.mul3(axis, -thick / 2)) : G.add3(from, G.mul3(axis, thick / 2));
@@ -351,19 +358,19 @@ function elbow(name, c, r, flats) {
 }
 
 // LOX: de la bomba a la cámara, recto y horizontal
-duct("pipe.lox", tpPoint(35.5, -13), onE(TP_AZ, 22, 35.5), 2.4, { flange: 1.3 });
+duct("pipe.lox", tpPoint(36, -13), onE(TP_AZ, 22, 36), 1.9, { flange: 1.5 });
 // soporte de la turbobomba a la cámara
 T.round({ name: "tp.strut", ...EN, F: frameOn(onE(TP_AZ, 22, 61), OUT, Z), s0: 0, s1: 48 - 12 - 22, r: 1.8, tone: "mid" });
 // Escape de la turbina: tramo radial, codo y bajada hasta la altura de la salida
 const EXH_R = 4.5;
-const EXH_BALL = onE(TP_AZ, 72, 46);
-const [exhIn, exhDown] = elbow("exh.elbow", EXH_BALL, 7.2, [[G.mul3(OUT, -1), 4.7], [[0, 0, -1], 4.7]]);
-duct("exh.stub", tpPoint(46, 15), exhIn, EXH_R, { flange: 1.4, ends: [true, false] });
-const EXH_END = onE(TP_AZ, 72, 200);
+const EXH_AT = 48 + 15 + 7.2;
+const EXH_BALL = onE(TP_AZ, EXH_AT, 46);
+const [exhDown] = elbow("exh.elbow", EXH_BALL, 7.2, [[[0, 0, -1], 4.7]]);
+const EXH_END = onE(TP_AZ, EXH_AT, 200);
 const BAND_AT = 120 - (46 + 4.7);
 duct("exh.duct", exhDown, EXH_END, EXH_R, { ends: [false, false], chunk: 200, gaps: [[BAND_AT - 1, BAND_AT + 1]] });
 T.round({ name: "exh.nozzle", ...EN, F: frameOn(EXH_END, [0, 0, -1], [1, 0, 0]), s0: 0, s1: 10, r: [EXH_R + 0.6, 7.4], tone: "mid", details: { seams: [2] } });
-T.round({ name: "exh.band", ...EN, F: frameOn(onE(TP_AZ, 72, 120), [0, 0, -1], [1, 0, 0]), s0: -1, s1: 1, r: EXH_R + 0.8, tone: "mid", owner: "exh.duct" });
+T.round({ name: "exh.band", ...EN, F: frameOn(onE(TP_AZ, EXH_AT, 120), [0, 0, -1], [1, 0, 0]), s0: -1, s1: 1, r: EXH_R + 0.8, tone: "mid", owner: "exh.duct" });
 // Combustible: sale por abajo de la bomba, baja recto al colector en T y rodea la campana
 const RING_S = 140;
 const RING_R = 40;
@@ -375,29 +382,25 @@ const [teeUp, teeA, teeB] = elbow("fuel.tee", TEE, 4.2, [[[0, 0, 1], 2.9], [dir(
 duct("fuel.duct", FUEL_X, teeUp, 3, { flange: 1.33, ends: [true, false], chunk: 200 });
 {
   const ring = G.arcPoints(EF, RING_S, RING_R, -(TP_AZ + HALF) * DEG, -(TP_AZ + 360 - HALF) * DEG, 96);
-  T.tube({ name: "fuel.ring", ...EN, route: ring, r: RING_T, chunk: 40, turn: 30, tone: "hi" });
+  T.tube({ name: "fuel.ring", ...EN, route: ring, r: RING_T, chunk: 40, turn: 30, tone: "hi", limp: false });
   void teeA;
   void teeB;
 }
 // Entrada de combustible: tramo corto, codo hacia arriba y brida donde llega el fuelle
 const FIN_DIR = dir(120);
-const FIN_BALL = [TP_C[0] + FIN_DIR[0] * 22, TP_C[1] + FIN_DIR[1] * 22, ZG - 60];
-const [finIn, finUp] = elbow("fuel.inlet.elbow", FIN_BALL, 4.6, [[G.mul3(FIN_DIR, -1), 3.6], [[0, 0, 1], 3.6]]);
-duct("fuel.inlet.stub", [TP_C[0] + FIN_DIR[0] * 12, TP_C[1] + FIN_DIR[1] * 12, ZG - 60], finIn, 2.6, { ends: [true, false] });
+const FIN_BALL = [TP_C[0] + FIN_DIR[0] * 16.6, TP_C[1] + FIN_DIR[1] * 16.6, ZG - 64];
+const [finUp] = elbow("fuel.inlet.elbow", FIN_BALL, 4.6, [[[0, 0, 1], 3.6]]);
 const FIN_TOP = G.add3(finUp, [0, 0, 3]);
 duct("fuel.inlet.riser", finUp, FIN_TOP, 2.6, { ends: [false, false] });
-T.round({ name: "fuel.inlet.flange", ...EN, F: frameOn(FIN_TOP, [0, 0, 1], [1, 0, 0]), s0: 0, s1: 1.6, r: 5.4, tone: "mid", details: { bolts: [{ s: 1.6, r: 4.4, count: 6, size: 0.38 }] } });
+T.round({ name: "fuel.inlet.flange", ...EN, F: frameOn(FIN_TOP, [0, 0, 1], [1, 0, 0]), s0: 0, s1: 1.6, r: 4.2, tone: "mid", details: { bolts: [{ s: 1.6, r: 3.4, count: 6, size: 0.36 }] } });
 // Generador de gas: cápsula junto a la turbina, con su salida a la turbina y un encendedor
 const GG_DIR = dir(TP_AZ - 110);
 const GG_C = [TP_C[0] + GG_DIR[0] * 26, TP_C[1] + GG_DIR[1] * 26];
 const GGF = G.frameOf([GG_C[0], GG_C[1], ZG], [0, 0, -1], [1, 0, 0], [0, -1, 0]);
 T.round({ name: "gg.body", ...EN, F: GGF, s0: 31, s1: 50, r: 5.5, ends: ["dome", "dome"], tone: "hi", crease: "lo", material: "steel", details: { seams: [40.5] } });
 T.round({ name: "gg.igniter", ...EN, F: GGF, s0: 31 - 5.5 - 3, s1: 31 - 5.5, r: 1.4, tone: "mid" });
-{
-  const from = [GG_C[0] - GG_DIR[0] * 5.5, GG_C[1] - GG_DIR[1] * 5.5, ZG - 46];
-  const to = [TP_C[0] + GG_DIR[0] * 15, TP_C[1] + GG_DIR[1] * 15, ZG - 46];
-  duct("gg.outlet", from, to, 2, { flange: 1.5, thick: 0.9 });
-}
+// conector esférico entre el generador y la turbina (tangente a los dos)
+T.ball({ name: "gg.outlet", ...EN, c: [TP_C[0] + GG_DIR[0] * 17.75, TP_C[1] + GG_DIR[1] * 17.75, ZG - 42], r: 2.75, tone: "hi", material: "steel" });
 // Transductores de presión sobre la cámara y la turbobomba
 for (const [name, az, s, r] of [["sensor.pc", 30, 60, 22], ["sensor.pc2", -60, 42, 22], ["sensor.tp", TP_AZ + 60, 64, 12]]) {
   const host = name === "sensor.tp" ? [TP_C[0], TP_C[1]] : [0, 0];
@@ -445,7 +448,7 @@ const restActs = ["lox", "fuel"].map((id) => bellowsSvg(G, k, P, FEEDS[id].top, 
 const actSvg = layerSvg([restActs], "tv-acts");
 const midSvg = layerSvg(layerOf("mid"), "tv-mid");
 const frontSvg = layerSvg(layerOf("front"), "tv-front");
-const stage = `<div class="iso-stage iso-turn tv-stage" tabindex="0" role="application" aria-label="Motor con empuje vectorial. Mueve el puntero sobre la figura o usa las flechas para inclinar el motor; I enciende o apaga el motor.">${backSvg}<canvas class="iso-layer tv-plume" aria-hidden="true"></canvas>${out.layerSvg("engine", { width: W, height: H })}${midSvg}${actSvg}${frontSvg}</div>`;
+const stage = `<div class="iso-stage iso-turn tv-stage" tabindex="0" role="application" aria-label="Motor con empuje vectorial. Mueve el puntero sobre la figura o usa las flechas para inclinar el motor; I enciende o apaga el motor.">${backSvg}<svg xmlns="http://www.w3.org/2000/svg" class="iso-svg iso-layer tv-fallback" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="tv-fb" gradientUnits="userSpaceOnUse"><stop offset="0" class="tv-fb-0"/><stop offset=".35" class="tv-fb-1"/><stop offset="1" class="tv-fb-2"/></linearGradient></defs><path class="tv-fb-plume" fill="url(#tv-fb)"/></svg><canvas class="iso-layer tv-plume" aria-hidden="true"></canvas>${out.layerSvg("engine", { width: W, height: H })}${midSvg}${actSvg}${frontSvg}</div>`;
 
 const DATA = {
   W, H, P, model: MODEL, turn: out.data,

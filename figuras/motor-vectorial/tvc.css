@@ -13,3 +13,9 @@
 .tv-fire:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:3px}
 .tv-lamp{width:8px;height:8px;border-radius:50%;background:var(--anatomy-faint);transition:background .3s,box-shadow .3s}
 .tv-fire[data-on] .tv-lamp{background:#f08a24;box-shadow:0 0 6px #f08a24}
+.tv{--tv-fb-0:#ffd25a;--tv-fb-1:#ff9a26;--tv-fb-2:rgba(255,140,40,0)}
+.iso[data-theme="dark"] .tv{--tv-fb-0:#fff0c0;--tv-fb-1:#ffa338;--tv-fb-2:rgba(255,120,30,0)}
+.tv-fb-0{stop-color:var(--tv-fb-0)}
+.tv-fb-1{stop-color:var(--tv-fb-1)}
+.tv-fb-2{stop-color:var(--tv-fb-2)}
+.tv-stage[data-gl] .tv-fallback{display:none}
