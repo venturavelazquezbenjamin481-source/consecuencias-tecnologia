@@ -237,15 +237,15 @@ function draw() {
   const b = stroke("B");
   const up = controller.anchor("yaw", DATA.GC, [0, 0, 1]).direction;
   const feed = (id, opts) => bellowsSvg(G, K, P, DATA.FEEDS[id].top, controller.anchor("yaw", DATA.FEEDS[id].bottom).world, up, id, opts);
-  actLayer.innerHTML = feed("lox", {}) + feed("fuel", { r: 5.6, core: 3.8, count: 14 }) + actuatorSvg(G, K, P, DATA.U.A, a.L, DATA.SIDE.A, "A") + actuatorSvg(G, K, P, DATA.U.B, b.L, DATA.SIDE.B, "B");
+  actLayer.innerHTML = feed("lox", {}) + feed("fuel", { r: 5, core: 3.4, count: 14 }) + actuatorSvg(G, K, P, DATA.U.A, a.L, DATA.SIDE.A, "A") + actuatorSvg(G, K, P, DATA.U.B, b.L, DATA.SIDE.B, "B");
   // ángulo total entre el eje del motor y la vertical
   const delta = Math.acos(Math.min(1, up[2])) / D2R;
   const thrust = M.thrustKN * burn.pc.x;
   const side = thrust * Math.sin(delta * D2R);
-  const state = burn.pc.x > 0.02 ? `lateral ${side.toFixed(1)} kN · par ${(side * M.leverM).toFixed(0)} kN·m` : "frío";
-  const text = `δ ${delta.toFixed(1)}° · ${state} · A ${signed(a.mm)} mm · B ${signed(b.mm)} mm`;
+  const state = burn.pc.x > 0.02 ? `${side.toFixed(1)} kN lateral` : "frío";
+  const text = `δ ${delta.toFixed(1)}° · ${state} · A ${signed(a.mm)} · B ${signed(b.mm)} mm`;
   if (readout.textContent !== text) readout.textContent = text;
-  stage.setAttribute("aria-valuetext", text);
+  stage.setAttribute("aria-valuetext", `${text}${burn.pc.x > 0.02 ? ` · par sobre el vehículo ${(side * M.leverM).toFixed(0)} kN·m` : ""}`);
   drawn = [p, q];
 }
 

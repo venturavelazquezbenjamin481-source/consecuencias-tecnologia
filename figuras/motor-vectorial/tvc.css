@@ -19,3 +19,6 @@
 .tv-fb-1{stop-color:var(--tv-fb-1)}
 .tv-fb-2{stop-color:var(--tv-fb-2)}
 .tv-stage[data-gl] .tv-fallback{display:none}
+.tv [data-corner="readout"]{white-space:normal;text-align:right;max-width:62%}
+.tv [data-corner="hint"]{max-width:36%}
+@media (max-width:560px){.tv [data-corner="hint"]{display:none}.tv [data-corner="readout"]{max-width:100%}}

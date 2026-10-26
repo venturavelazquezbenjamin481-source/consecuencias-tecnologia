@@ -9,6 +9,7 @@ import * as TA from "./anatomy/kit/turn-audit.mjs";
 import { kitScript, turnScript, glScript } from "./anatomy/scripts/inline-kit.mjs";
 import { glCamera } from "./anatomy/kit/gl.mjs";
 import { ACT, actuatorSvg, bellowsSvg } from "./actuators.mjs";
+import { tubePieces, tubeSvg } from "./anatomy/kit/tube.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
@@ -142,6 +143,7 @@ function pitSvg() {
 }
 
 // Ángulo de acero alrededor del foso y aro de agua
+let PIT_RIM = null;
 function pitRim() {
   const out = [];
   const rim = k.insetPlan(PIT, -6);
@@ -155,7 +157,8 @@ function pitRim() {
   for (let t = rim.x + 12; t < rim.x + rim.w - 6; t += 18) bolts.push([t, rim.y + 3], [t, rim.y + rim.d - 3]);
   for (let t = rim.y + 12; t < rim.y + rim.d - 6; t += 18) bolts.push([rim.x + 3, t], [rim.x + rim.w - 3, t]);
   out.push(Dots(bolts.map(([x, y]) => at([x, y, 2.2])), { size: 0.45 }));
-  put("back", "stand.pit-rim", [0, 0, 1], out.join(""), [A.slab(rim, 0, 2.2)], -30);
+  PIT_RIM = A.slab(rim, 0, 2.2);
+  put("back", "stand.pit-rim", [0, 0, 1], out.join(""), [PIT_RIM], -30);
 }
 
 // Placa de identificación grabada y regla en el borde de la losa
@@ -253,6 +256,86 @@ function upperBrackets() {
   }
 }
 
+// Tubo o cable fijo, troceado para ordenarse por profundidad
+function staticTube(layer, name, route, r, { tone = "mid", touch, closed = false, gaps = [], maxLength = 30, limp = false, caps = true, bias = 0 } = {}) {
+  R.route(name, route, r, { owner: name, touch, limp, closed, gaps });
+  tubePieces(route, r, P, { maxLength, closed, gaps, caps, spacing: Math.max(0.8, Math.min(2, r * 0.4)) }).forEach((part, index) => R.put({ name: `${name}:${index}`, layer, at: part.mid, bias, svg: tubeSvg(part, { tone }), shapes: [A.tube(part.points, part.radii, { owner: name })], route: name, chunk: index }));
+}
+
+// Aro de agua alrededor del foso, con boquillas y su alimentación desde el borde de la losa
+function deluge() {
+  const ring = k.insetPlan(PIT, -3);
+  const z = 2.2 + 1.6;
+  const corners = [[ring.x, ring.y], [ring.x + ring.w, ring.y], [ring.x + ring.w, ring.y + ring.d], [ring.x, ring.y + ring.d]].map(([x, y]) => [x, y, z]);
+  const mid = [(corners[0][0] + corners[1][0]) / 2, corners[0][1], z];
+  const loop = G.resample(G.fillet([mid, corners[1], corners[2], corners[3], corners[0], mid], 14, 14, { P, tube: 1.6 }), 1);
+  // la T donde entra la alimentación: el aro se interrumpe bajo la bola
+  let best = 0;
+  loop.forEach((p, i) => { if (Math.hypot(p[0] - (ring.x + ring.w), p[1] + 28) < Math.hypot(loop[best][0] - (ring.x + ring.w), loop[best][1] + 28)) best = i; });
+  const TEE = loop[best];
+  const teeAt = G.pathLength(loop.slice(0, best + 1));
+  const TEE_R = 3.2;
+  const cut = Math.sqrt(TEE_R ** 2 - 1.6 ** 2);
+  // el aro empieza y termina en la bola de la T: dos extremos reales, con la bola como asiento
+  const total = G.pathLength(loop);
+  const around = [...G.cut(loop, teeAt + cut, total), ...G.cut(loop, 0, teeAt - cut).slice(1)];
+  staticTube("back", "stand.deluge", around, 1.6, { touch: ["stand.pit-rim"], maxLength: 60, bias: -25 });
+  const teeBall = A.ball(TEE, TEE_R, { seated: true, cut: [PIT_RIM] });
+  put("back", "stand.deluge.tee", TEE, S(G.sphereOf(TEE, TEE_R, P), { tone: "hi" }), [teeBall], -24.5);
+  const nozzles = [];
+  for (let t = ring.x + 18; t < ring.x + ring.w - 16; t += 12) nozzles.push([t, ring.y, z + 1.6], [t, ring.y + ring.d, z + 1.6]);
+  for (let t = ring.y + 18; t < ring.y + ring.d - 16; t += 12) nozzles.push([ring.x, t, z + 1.6], [ring.x + ring.w, t, z + 1.6]);
+  put("back", "stand.deluge.nozzles", [0, 0, z + 1.6], Dots(nozzles.map((p) => at(p)), { size: 0.55, tone: "hi" }), nozzles.map((p) => A.ball(p, 0.55 / KS, { owner: "stand.deluge" })), -24);
+  // alimentación: del aro al bloque de válvulas junto al borde de la losa
+  const VALVE = { x: 108, y: -36, w: 18, d: 16, r: 1.6 };
+  const from = [TEE[0] + cut, TEE[1], z];
+  const to = [VALVE.x, TEE[1], z];
+  staticTube("back", "stand.deluge.feed", [from, to], 1.6, { touch: ["stand.pit-rim"], bias: -24 });
+  const svg = S(k.slabOf(VALVE, 0, 9, P, 3, 0.5), { tone: "mid", inner: Ln(k.sideSeam(VALVE, 3, P, 3), { tone: "faint" }) }) + S(k.cylinder(VALVE.x + 9, VALVE.y + 8, 3.4, 9, 2.4, P, 24), { tone: "hi" }) + Ln(k.knurl(VALVE.x + 9, VALVE.y + 8, 3.4, 9, 11.4, 18, P), { tone: "lo" }) + Dots(k.corners(VALVE, 2.2).map(([x, y]) => at([x, y, 9])), { size: 0.4 });
+  put("back", "stand.deluge.valve", [VALVE.x + 9, VALVE.y + 8, 0], svg, [A.slab(VALVE, 0, 9), A.cylinder(VALVE.x + 9, VALVE.y + 8, 3.4, 9, 2.4)], -23);
+}
+
+// Escalera en la columna izquierda
+function ladder() {
+  const [cx, cy] = COLUMN_AT[0];
+  const face = cy + COLUMN / 2;
+  const out = [];
+  const shapes = [];
+  // los peldaños van primero: los largueros tapan sus extremos
+  const rungs = [];
+  for (let z = 36; z < BEAM_Z - 50; z += 26) rungs.push(k.segment([cx - 9, face + 9.3, z], [cx + 9, face + 9.3, z], P));
+  out.push(Ln(rungs.join(""), { tone: "mid" }));
+  for (const x of [cx - 9, cx + 9]) {
+    out.push(S(k.slabOf({ x: x - 1.3, y: face + 8, w: 2.6, d: 2.6, r: 0.6 }, 16, BEAM_Z - 60, P, 2), { tone: "mid", crease: "none" }));
+    shapes.push(A.box([x - 1.3, face + 8, 16], [x + 1.3, face + 10.6, BEAM_Z - 44]));
+    for (const z of [60, BEAM_Z - 80]) {
+      out.push(S(k.slabOf({ x: x - 1, y: face, w: 2, d: 8, r: 0.4 }, z, 2, P, 2), { tone: "mid", crease: "none" }));
+      shapes.push(A.box([x - 1, face, z], [x + 1, face + 8, z + 2]));
+    }
+  }
+  put("back", "stand.ladder", [cx, face + 9, 100], out.join(""), shapes, -5);
+}
+
+// Caja de conexiones sobre la placa y cables a los conectores de los soportes
+function harness() {
+  const BOX = { x: 14, y: 26, w: 26, d: 14, r: 1.6 };
+  const z0 = PLATE_Z[1];
+  const h = 11;
+  const svg = S(k.slabOf(BOX, z0, h, P, 3, 0.6), { tone: "hi", crease: "lo", inner: Ln(k.sideSeam(BOX, z0 + h - 3, P, 3), { tone: "faint" }) }) + Ln(k.planOutline(k.insetPlan(BOX, 1.8), z0 + h, P, 3), { tone: "faint" }) + Ln([0, 1, 2].map((row) => k.lineOnTop([BOX.x + 4, BOX.y + 3.6 + row * 2.4], [BOX.x + (row === 1 ? 13 : 18), BOX.y + 3.6 + row * 2.4], z0 + h, P)).join(""), { tone: "lo", free: true }) + Dots(k.corners(BOX, 2.2).map(([x, y]) => at([x, y, z0 + h])), { size: 0.42 });
+  put("front", "stand.harness.box", [BOX.x + 13, BOX.y + 7, z0], svg, [A.slab(BOX, z0, h)], 160);
+  const r = 0.62;
+  const routes = {
+    A: [[BOX.x + BOX.w, BOX.y + 4, z0 + 4], [BOX.x + BOX.w + 6, BOX.y + 4, z0 + 4], [BOX.x + BOX.w + 6, BOX.y + 4, z0 + r], [66, BOX.y + 4, z0 + r], [76.5, -5.2, z0 + r], [76.5, -5.2, PLATE_Z[0] - 2], [U.A[0] + 7, U.A[1], PLATE_Z[0] - 2]],
+    B: [[BOX.x + 4, BOX.y + BOX.d, z0 + 4], [BOX.x + 4, BOX.y + BOX.d + 6, z0 + 4], [BOX.x + 4, BOX.y + BOX.d + 6, z0 + r], [BOX.x + 4, 66, z0 + r], [5.2, 76.5, z0 + r], [5.2, 76.5, PLATE_Z[0] - 2], [U.B[0], U.B[1] + 7, PLATE_Z[0] - 2]],
+  };
+  for (const [id, points] of Object.entries(routes)) {
+    const route = G.fillet(points, 2.4, 8);
+    staticTube("front", `stand.harness.${id}`, route, r, { touch: ["stand.plate", "stand.harness.box", `stand.bracket.${id}`], limp: true, maxLength: 14, bias: 170 });
+    const end = route[route.length - 1];
+    put("front", `stand.harness.${id}.end`, end, Dots([at(end)], { size: 0.5, tone: "hi" }), [A.ball(end, 0.5 / KS)], 171);
+  }
+}
+
 deck();
 pitRim();
 deckFurniture();
@@ -261,6 +344,9 @@ beam();
 thrustPlate();
 thrustCone();
 upperBrackets();
+deluge();
+ladder();
+harness();
 
 // ───────────── Motor (grupos 3D) ─────────────
 export const T = turning(P, { recorder: R });
@@ -387,14 +473,14 @@ duct("fuel.duct", FUEL_X, teeUp, 3, { flange: 1.33, ends: [true, false], chunk: 
   void teeB;
 }
 // Entrada de combustible: tramo corto, codo hacia arriba y brida donde llega el fuelle
-const FIN_DIR = dir(120);
+const FIN_DIR = dir(130);
 const FIN_BALL = [TP_C[0] + FIN_DIR[0] * 16.6, TP_C[1] + FIN_DIR[1] * 16.6, ZG - 64];
 const [finUp] = elbow("fuel.inlet.elbow", FIN_BALL, 4.6, [[[0, 0, 1], 3.6]]);
 const FIN_TOP = G.add3(finUp, [0, 0, 3]);
 duct("fuel.inlet.riser", finUp, FIN_TOP, 2.6, { ends: [false, false] });
 T.round({ name: "fuel.inlet.flange", ...EN, F: frameOn(FIN_TOP, [0, 0, 1], [1, 0, 0]), s0: 0, s1: 1.6, r: 4.2, tone: "mid", details: { bolts: [{ s: 1.6, r: 3.4, count: 6, size: 0.36 }] } });
 // Generador de gas: cápsula junto a la turbina, con su salida a la turbina y un encendedor
-const GG_DIR = dir(TP_AZ - 110);
+const GG_DIR = dir(TP_AZ + 90);
 const GG_C = [TP_C[0] + GG_DIR[0] * 26, TP_C[1] + GG_DIR[1] * 26];
 const GGF = G.frameOf([GG_C[0], GG_C[1], ZG], [0, 0, -1], [1, 0, 0], [0, -1, 0]);
 T.round({ name: "gg.body", ...EN, F: GGF, s0: 31, s1: 50, r: 5.5, ends: ["dome", "dome"], tone: "hi", crease: "lo", material: "steel", details: { seams: [40.5] } });
@@ -402,7 +488,7 @@ T.round({ name: "gg.igniter", ...EN, F: GGF, s0: 31 - 5.5 - 3, s1: 31 - 5.5, r: 
 // conector esférico entre el generador y la turbina (tangente a los dos)
 T.ball({ name: "gg.outlet", ...EN, c: [TP_C[0] + GG_DIR[0] * 17.75, TP_C[1] + GG_DIR[1] * 17.75, ZG - 42], r: 2.75, tone: "hi", material: "steel" });
 // Transductores de presión sobre la cámara y la turbobomba
-for (const [name, az, s, r] of [["sensor.pc", 30, 60, 22], ["sensor.pc2", -60, 42, 22], ["sensor.tp", TP_AZ + 60, 64, 12]]) {
+for (const [name, az, s, r] of [["sensor.pc", 30, 60, 22], ["sensor.pc2", -60, 42, 22], ["sensor.tp", TP_AZ + 30, 64, 12]]) {
   const host = name === "sensor.tp" ? [TP_C[0], TP_C[1]] : [0, 0];
   const out = dir(az);
   const base = [host[0] + out[0] * r, host[1] + out[1] * r, ZG - s];
@@ -444,7 +530,7 @@ if (argv.includes("--audit")) {
 const LABEL = "Banco de pruebas de vectorización de empuje: un motor cohete cuelga de un cardán de dos ejes bajo la placa de empuje de un pórtico de dos columnas. Dos actuadores electromecánicos, a 90° entre sí, empujan el motor por debajo del cardán y lo inclinan; bajo la tobera hay un foso de llamas en la losa.";
 const backSvg = k.figureSvg({ width: W, height: H, label: LABEL, body: [`<path class="iso-halo" d="${k.haloOf(DECK, -DECK_H - FOOT_H, DECK_H, P)}"/>`, ...layerOf("back")] });
 const layerSvg = (list, cls) => `<svg xmlns="http://www.w3.org/2000/svg" class="iso-svg iso-layer ${cls}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${list.join("")}</svg>`;
-const restActs = ["lox", "fuel"].map((id) => bellowsSvg(G, k, P, FEEDS[id].top, FEEDS[id].bottom, [0, 0, 1], id, id === "fuel" ? { r: 5.6, core: 3.8, count: 14 } : {})).join("") + ["A", "B"].map((id) => actuatorSvg(G, k, P, U[id], L0[id], SIDE[id], id)).join("");
+const restActs = ["lox", "fuel"].map((id) => bellowsSvg(G, k, P, FEEDS[id].top, FEEDS[id].bottom, [0, 0, 1], id, id === "fuel" ? { r: 5, core: 3.4, count: 14 } : {})).join("") + ["A", "B"].map((id) => actuatorSvg(G, k, P, U[id], L0[id], SIDE[id], id)).join("");
 const actSvg = layerSvg([restActs], "tv-acts");
 const midSvg = layerSvg(layerOf("mid"), "tv-mid");
 const frontSvg = layerSvg(layerOf("front"), "tv-front");
