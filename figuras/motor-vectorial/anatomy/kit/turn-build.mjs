@@ -1138,7 +1138,7 @@ function build(T, { statics = [], verify = false, poses = null, strict = true, f
   const framedCloud = (part, frame) => {
     const key = `${part.id}|${frame ? frame.index : -1}`;
     if (cloudCache.has(key)) return cloudCache.get(key);
-    const local = thinCloud(part.samples, 32);
+    const local = thinCloud(part.samples, 96);
     const out = [];
     for (const cams of sampleStates()) {
       const c = part.group ? cams[part.group.index] : cams.world;

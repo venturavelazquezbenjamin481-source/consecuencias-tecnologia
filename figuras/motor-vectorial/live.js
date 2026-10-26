@@ -4,6 +4,12 @@ const readout = document.querySelector("[data-readout]");
 const actLayer = stage.querySelector(".tv-acts");
 const fireButton = document.querySelector("[data-fire]");
 const fireLabel = document.querySelector("[data-fire-label]");
+const apartButton = document.querySelector("[data-apart]");
+const apartLabel = document.querySelector("[data-apart-label]");
+const partButtons = [...document.querySelectorAll("[data-part]")];
+const infoTitle = document.querySelector("[data-info-title]");
+const infoText = document.querySelector("[data-info-text]");
+const INFO_REST = { title: infoTitle.textContent, text: infoText.textContent };
 const liveText = document.querySelector("[data-say]");
 const still = matchMedia("(prefers-reduced-motion: reduce)");
 const M = DATA.model;
@@ -34,11 +40,17 @@ const clampCone = (p, q) => {
   const m = Math.hypot(p, q);
   return m > M.limit ? [(p * M.limit) / m, (q * M.limit) / m] : [p, q];
 };
-// Recorrido: encendido, dos vueltas de cono, cuatro escalones, apagado y reposo en frío
-const TOUR = 30;
+// Recorrido: encendido, dos vueltas de cono, cuatro escalones, apagado, y luego la anatomía:
+// despiece y cada conjunto resaltado por turno, antes de volver a montar
+const ANATOMY_AT = 27;
+const PART_TIME = 2.8;
+const TOUR = ANATOMY_AT + 1.4 + DATA.assemblies.length * PART_TIME + 3;
 function tourAt(t) {
   t %= TOUR;
   const fire = t > 0.8 && t < 25;
+  const along = t - ANATOMY_AT - 1.4;
+  const apartOn = t > ANATOMY_AT && along < DATA.assemblies.length * PART_TIME;
+  const part = apartOn && along >= 0 ? DATA.assemblies[Math.min(DATA.assemblies.length - 1, Math.floor(along / PART_TIME))].id : null;
   let p = 0;
   let q = 0;
   if (t > 3 && t < 15) {
@@ -49,15 +61,15 @@ function tourAt(t) {
   } else if (t >= 15 && t < 24.6) {
     [p, q] = [[5, 0], [-5, 0], [0, 5], [0, -5]][Math.min(3, Math.floor((t - 15) / 2.4))];
   }
-  return { p, q, fire };
+  return { p, q, fire, apart: apartOn, part };
 }
 const hold = () => {
   touring = false;
   clearTimeout(idle);
   idle = setTimeout(() => {
     touring = !still.matches;
-    // el recorrido retoma desde donde coincide con el motor: encendido o apagado
-    tourClock = burn.on ? 1 : 0;
+    // el recorrido retoma desde donde coincide con el motor: encendido, despiezado o en frío
+    tourClock = apart.on ? ANATOMY_AT + 1.4 : burn.on ? 1 : 0;
     run();
   }, 6000);
 };
@@ -71,6 +83,57 @@ function setFire(on) {
   fireButton.toggleAttribute("data-on", on);
   fireLabel.textContent = on ? "Apagar" : "Encender";
   say(on ? "encendido" : "apagado");
+}
+
+// ───────────── Despiece y selección ─────────────
+const EX = DATA.explode;
+const apart = { on: false, waiting: false, clock: 0, groups: Object.fromEntries(EX.order.map((id) => [id, { from: 0, to: 0, start: -1e9 }])) };
+let focus = null;
+let pinned = null;
+const shareOf = (id) => {
+  const g = apart.groups[id];
+  return g.from + (g.to - g.from) * springStep(apart.clock - g.start, EX.omega);
+};
+const exploding = () => EX.order.some((id) => apart.clock - apart.groups[id].start < 2 && apart.groups[id].from !== apart.groups[id].to);
+// Cada conjunto sale en su turno (y vuelve en el orden inverso) desde donde esté
+function launch(open) {
+  const n = EX.order.length;
+  EX.order.forEach((id, i) => {
+    const g = apart.groups[id];
+    g.from = shareOf(id);
+    g.to = open ? 1 : 0;
+    g.start = still.matches ? -1e9 : apart.clock + (open ? i : n - 1 - i) * EX.stagger;
+    if (still.matches) g.from = g.to;
+  });
+  apart.waiting = false;
+}
+function setApart(on) {
+  if (apart.on === on) return;
+  apart.on = on;
+  if (on) {
+    setFire(false);
+    cmd = { p: 0, q: 0 };
+    apart.waiting = true;
+  } else {
+    apart.waiting = false;
+    launch(false);
+    select(null);
+    pinned = null;
+  }
+  apartButton.toggleAttribute("data-on", on);
+  apartLabel.textContent = on ? "Montar" : "Despiezar";
+  stage.toggleAttribute("data-apart", on);
+  say(on ? "despiece" : "montado");
+}
+function select(id) {
+  if (focus === id) return;
+  focus = id;
+  if (id) stage.setAttribute("data-focus", id);
+  else stage.removeAttribute("data-focus");
+  partButtons.forEach((button) => button.toggleAttribute("data-on", button.dataset.part === id));
+  const a = DATA.assemblies.find((entry) => entry.id === id);
+  infoTitle.textContent = a ? `${String(DATA.assemblies.indexOf(a) + 1).padStart(2, "0")} · ${a.name}` : INFO_REST.title;
+  infoText.textContent = a ? a.text : INFO_REST.text;
 }
 
 const controller = TURN.mount(stage, DATA.turn, { follow: (v) => v, onHold: () => hold() });
@@ -195,7 +258,7 @@ function paintFallback() {
     fbPath.setAttribute("d", "");
     return;
   }
-  const exit = controller.anchor("yaw", EXIT, [0, 0, -1]);
+  const exit = controller.anchor("nozzle", EXIT, [0, 0, -1]);
   const d = exit.direction;
   const F = G.frameAlong(exit.world, d);
   const pts = [];
@@ -218,7 +281,7 @@ function paintPlume() {
     plumeLive = false;
     return;
   }
-  const exit = controller.anchor("yaw", EXIT, [0, 0, -1]);
+  const exit = controller.anchor("nozzle", EXIT, [0, 0, -1]);
   plume.draw({ uExit: exit.world, uDir: exit.direction, uPc: pc, uFlash: flash }, still.matches ? 0.8 : clock);
   plumeLive = true;
 }
@@ -233,7 +296,8 @@ const signed = (v, digits = 0) => (Math.abs(v) < 0.5 * 10 ** -digits ? "±" : v 
 function draw() {
   const p = servo.p.x;
   const q = servo.q.x;
-  controller.set({ pitch: p, yaw: q });
+  const slides = slidesOf(Object.fromEntries(EX.order.map((id) => [id, shareOf(id)])), EX);
+  controller.set({ pitch: p, yaw: q, ...slides });
   const a = stroke("A");
   const b = stroke("B");
   const up = controller.anchor("yaw", DATA.GC, [0, 0, 1]).direction;
@@ -244,7 +308,9 @@ function draw() {
   const thrust = M.thrustKN * burn.pc.x;
   const side = thrust * Math.sin(delta * D2R);
   const state = burn.pc.x > 0.02 ? `${side.toFixed(1)} kN lateral` : "frío";
-  const text = `δ ${delta.toFixed(1)}° · ${state} · A ${signed(a.mm)} · B ${signed(b.mm)} mm`;
+  const opened = EX.order.some((id) => shareOf(id) > 0.01);
+  const named = DATA.assemblies.find((entry) => entry.id === focus);
+  const text = opened || apart.on ? `despiece · ${named ? named.name.toLowerCase() : "elige un conjunto"}` : `δ ${delta.toFixed(1)}° · ${state} · A ${signed(a.mm)} · B ${signed(b.mm)} mm`;
   if (readout.textContent !== text) readout.textContent = text;
   stage.setAttribute("aria-valuetext", `${text}${burn.pc.x > 0.02 ? ` · par sobre el vehículo ${(side * M.leverM).toFixed(0)} kN·m` : ""}`);
   drawn = [p, q];
@@ -258,8 +324,10 @@ function tick(now) {
   if (touring) {
     tourClock += dt;
     const step = tourAt(tourClock);
-    cmd = { p: step.p, q: step.q };
-    setFire(step.fire);
+    if (!step.apart) cmd = { p: step.p, q: step.q };
+    setApart(step.apart);
+    if (step.apart) select(step.part);
+    setFire(step.fire && !step.apart);
   }
   let moving = false;
   for (const axis of ["p", "q"]) {
@@ -279,6 +347,10 @@ function tick(now) {
       s.v = 0;
     } else moving = true;
   }
+  apart.clock += dt;
+  if (apart.waiting && Math.abs(servo.p.x) < 0.05 && Math.abs(servo.q.x) < 0.05) launch(true);
+  const parting = apart.waiting || exploding();
+  if (parting) moving = true;
   const pcBefore = burn.pc.x;
   const burning = settle(burn.pc, burn.on ? 1 : 0, dt, burn.on ? 0.18 : 0.22, calm);
   if (burn.flash >= 0) burn.flash += dt;
@@ -304,6 +376,7 @@ addEventListener("resize", () => paintPlume());
 const exitScreen = iso(EXIT, P);
 const cam = { sinA: Math.sin((P.azimuth * Math.PI) / 180), cosA: Math.cos((P.azimuth * Math.PI) / 180), sinE: Math.sin((P.elevation * Math.PI) / 180) };
 stage.addEventListener("pointermove", (event) => {
+  if (apart.on) return;
   const box = stage.getBoundingClientRect();
   const vx = ((event.clientX - box.left) / box.width) * DATA.W - exitScreen[0];
   const vy = ((event.clientY - box.top) / box.height) * DATA.H - exitScreen[1];
@@ -326,9 +399,32 @@ stage.addEventListener("pointerleave", () => {
 });
 const toggleFire = () => {
   hold();
+  if (apart.on) setApart(false);
   setFire(!burn.on);
   run();
 };
+const toggleApart = () => {
+  hold();
+  setApart(!apart.on);
+  run();
+};
+apartButton.addEventListener("click", toggleApart);
+const choose = (id, pin) => {
+  hold();
+  setApart(true);
+  if (pin !== undefined) pinned = pin;
+  select(id);
+  run();
+};
+partButtons.forEach((button) => {
+  const id = button.dataset.part;
+  button.addEventListener("pointerenter", () => choose(id));
+  button.addEventListener("focus", () => choose(id));
+  button.addEventListener("pointerleave", () => {
+    if (pinned !== id) select(pinned);
+  });
+  button.addEventListener("click", () => choose(pinned === id ? null : id, pinned === id ? null : id));
+});
 fireButton.addEventListener("click", toggleFire);
 stage.addEventListener("keydown", (event) => {
   const step = event.shiftKey ? 3 : 1;
@@ -336,6 +432,25 @@ stage.addEventListener("keydown", (event) => {
   if (event.key === "i" || event.key === "I") {
     event.preventDefault();
     toggleFire();
+    return;
+  }
+  if (event.key === "d" || event.key === "D") {
+    event.preventDefault();
+    toggleApart();
+    return;
+  }
+  const digit = Number(event.key);
+  if (Number.isInteger(digit) && digit >= 1 && digit <= DATA.assemblies.length) {
+    event.preventDefault();
+    const id = DATA.assemblies[digit - 1].id;
+    choose(id, id);
+    return;
+  }
+  if (event.key === "Escape" && apart.on) {
+    event.preventDefault();
+    hold();
+    setApart(false);
+    run();
     return;
   }
   if (event.key === "ArrowUp") p += step;
@@ -364,6 +479,7 @@ window.__tv = {
     burn.pc = { x: pc, v: 0 };
     burn.flash = -1;
     fireButton.toggleAttribute("data-on", burn.on);
+    fireLabel.textContent = burn.on ? "Apagar" : "Encender";
     draw();
     paintPlume();
   },

@@ -10,6 +10,7 @@ import { kitScript, turnScript, glScript } from "./anatomy/scripts/inline-kit.mj
 import { glCamera } from "./anatomy/kit/gl.mjs";
 import { ACT, actuatorSvg, bellowsSvg } from "./actuators.mjs";
 import { tubePieces, tubeSvg } from "./anatomy/kit/tube.mjs";
+import { EXPLODE, explodeAt, slidesOf, springStep } from "./explode.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
@@ -361,6 +362,23 @@ const frameOn = (o, a, u) => {
   return { o, a: axis, u: uu, v: G.cross3(axis, uu) };
 };
 const EN = { group: yaw, layer: live };
+// Despiece: la tobera baja, la turbobomba sale hacia fuera y de ella se separan el escape y el generador
+const TPD = dir(175);
+const nozzleG = T.group("nozzle", { parent: yaw, slide: { direction: [0, 0, -1], travel: EXPLODE.travel.nozzle } });
+const tpG = T.group("tp", { parent: yaw, slide: { direction: TPD, travel: EXPLODE.travel.tp } });
+const exhG = T.group("exh", { parent: tpG, slide: { direction: TPD, travel: EXPLODE.travel.exh } });
+const ggG = T.group("gg", { parent: tpG, slide: { direction: [0, 0, -1], travel: EXPLODE.travel.gg } });
+const GROUP_OF = [
+  [["engine.bell", "engine.lip", "fuel.ring", "fuel.tee"], nozzleG],
+  [["tp.", "pipe.lox", "fuel.duct", "fuel.inlet", "sensor.tp"], tpG],
+  [["exh."], exhG],
+  [["gg."], ggG],
+];
+const groupFor = (name) => GROUP_OF.find(([prefixes]) => prefixes.some((prefix) => name.startsWith(prefix)))?.[1] ?? yaw;
+for (const kind of ["round", "prism", "lathe", "ball", "tube"]) {
+  const make = T[kind];
+  T[kind] = (options) => make(options.group === yaw ? { ...options, group: groupFor(options.name ?? "") } : options);
+}
 const round = (name, s0, s1, r, extra = {}) => T.round({ name, ...EN, F: EF, s0, s1, r, tone: "hi", crease: "lo", ...extra });
 
 // Cardán: orejas fijas (eje 1), cruceta (grupo pitch), orejas del motor (eje 2)
@@ -449,12 +467,12 @@ duct("pipe.lox", tpPoint(36, -13), onE(TP_AZ, 22, 36), 1.9, { flange: 1.5 });
 T.round({ name: "tp.strut", ...EN, F: frameOn(onE(TP_AZ, 22, 61), OUT, Z), s0: 0, s1: 48 - 12 - 22, r: 1.8, tone: "mid" });
 // Escape de la turbina: tramo radial, codo y bajada hasta la altura de la salida
 const EXH_R = 4.5;
-const EXH_AT = 48 + 15 + 7.2;
+const EXH_AT = 48 + 15 + 6.8;
 const EXH_BALL = onE(TP_AZ, EXH_AT, 46);
-const [exhDown] = elbow("exh.elbow", EXH_BALL, 7.2, [[[0, 0, -1], 4.7]]);
+const [exhDown] = elbow("exh.elbow", EXH_BALL, 7.2, [[[0, 0, -1], 4.7], [G.mul3(OUT, -1), 6.8]]);
 const EXH_END = onE(TP_AZ, EXH_AT, 200);
 const BAND_AT = 120 - (46 + 4.7);
-duct("exh.duct", exhDown, EXH_END, EXH_R, { ends: [false, false], chunk: 200, gaps: [[BAND_AT - 1, BAND_AT + 1]] });
+duct("exh.duct", exhDown, EXH_END, EXH_R, { ends: [false, false], chunk: 30, gaps: [[BAND_AT - 1, BAND_AT + 1]] });
 T.round({ name: "exh.nozzle", ...EN, F: frameOn(EXH_END, [0, 0, -1], [1, 0, 0]), s0: 0, s1: 10, r: [EXH_R + 0.6, 7.4], tone: "mid", details: { seams: [2] } });
 T.round({ name: "exh.band", ...EN, F: frameOn(onE(TP_AZ, EXH_AT, 120), [0, 0, -1], [1, 0, 0]), s0: -1, s1: 1, r: EXH_R + 0.8, tone: "mid", owner: "exh.duct" });
 // Combustible: sale por abajo de la bomba, baja recto al colector en T y rodea la campana
@@ -465,7 +483,7 @@ const FUEL_X = tpPoint(71, -8);
 const TEE = onE(TP_AZ, RING_R, RING_S);
 const HALF = Math.asin(3.5 / RING_R) / DEG;
 const [teeUp, teeA, teeB] = elbow("fuel.tee", TEE, 4.2, [[[0, 0, 1], 2.9], [dir(TP_AZ + HALF + 90), 3.5], [dir(TP_AZ - HALF - 90), 3.5]]);
-duct("fuel.duct", FUEL_X, teeUp, 3, { flange: 1.33, ends: [true, false], chunk: 200 });
+duct("fuel.duct", FUEL_X, teeUp, 3, { flange: 1.33, ends: [true, false], chunk: 30 });
 {
   const ring = G.arcPoints(EF, RING_S, RING_R, -(TP_AZ + HALF) * DEG, -(TP_AZ + 360 - HALF) * DEG, 96);
   T.tube({ name: "fuel.ring", ...EN, route: ring, r: RING_T, chunk: 40, turn: 30, tone: "hi", limp: false });
@@ -511,19 +529,31 @@ for (const [id, feed, r] of [["lox", FEEDS.lox, 5.2], ["fuel", FEEDS.fuel, 3.6]]
 }
 
 export const follow = (values) => ({ ...values });
+// Estados de prueba. El motor 3D toma como mucho 24 muestras para sus planos entre grupos, así que
+// se le dan los extremos: el cono del cardán y, centrado, los estados "prefijo" del despiece (los k
+// primeros conjuntos fuera, el siguiente a medias). Con el escalonado, cada fracción del orden es
+// menor o igual que la anterior, así que todo fotograma real es combinación de estos estados.
+const EXPLODE_END = 1.9;
 export const poses = () => {
-  const out = [];
-  for (let p = -6; p <= 6; p += 1) for (let q = -6; q <= 6; q += 1) out.push({ pitch: p, yaw: q });
+  const out = [{ pitch: 0, yaw: 0 }];
+  for (let i = 0; i < 8; i++) out.push({ pitch: 6 * Math.cos((i * Math.PI) / 4), yaw: 6 * Math.sin((i * Math.PI) / 4) });
+  for (let i = 0; i < 4; i++) out.push({ pitch: 3 * Math.cos((i * Math.PI) / 2 + Math.PI / 4), yaw: 3 * Math.sin((i * Math.PI) / 2 + Math.PI / 4) });
+  EXPLODE.order.forEach((_, k) => {
+    for (const half of [0.5, 1]) {
+      const shares = Object.fromEntries(EXPLODE.order.map((id, i) => [id, i < k ? 1 : i === k ? half : 0]));
+      out.push({ pitch: 0, yaw: 0, ...slidesOf(shares) });
+    }
+  });
   return out;
 };
 
 const verify = argv.includes("--verify");
 const out = T.build({ statics: R.items, poses, verify });
 A.settle(R, P);
-const layerOf = (name) => R.items.filter((item) => item.layer === name).sort((a, b) => a.key - b.key).map((item) => item.svg);
+const layerOf = (name) => R.items.filter((item) => item.layer === name).sort((a, b) => a.key - b.key).map((item) => `<g data-name="${item.name}">${item.svg}</g>`);
 if (argv.includes("--audit")) {
   A.auditOrExit(R, P);
-  TA.orbitOrExit(T, R, P, { poses: poses(), quick: argv.includes("--quick"), only: argv.find((a) => a.startsWith("--only="))?.slice(7).split(",") ?? null });
+  TA.orbitOrExit(T, R, P, { poses: poses(), clips: [true, false].map((open) => ({ name: open ? "despiece" : "montaje", at: (t) => ({ pitch: 0, yaw: 0, ...slidesOf(explodeAt(t, open)) }), from: 0, to: EXPLODE_END, frame: 1 / 60 })), quick: argv.includes("--quick"), only: argv.find((a) => a.startsWith("--only="))?.slice(7).split(",") ?? null });
 }
 
 // Lienzo de la página
@@ -536,8 +566,52 @@ const midSvg = layerSvg(layerOf("mid"), "tv-mid");
 const frontSvg = layerSvg(layerOf("front"), "tv-front");
 const stage = `<div class="iso-stage iso-turn tv-stage" tabindex="0" role="application" aria-label="Motor con empuje vectorial. Mueve el puntero sobre la figura o usa las flechas para inclinar el motor; I enciende o apaga el motor.">${backSvg}<svg xmlns="http://www.w3.org/2000/svg" class="iso-svg iso-layer tv-fallback" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><linearGradient id="tv-fb" gradientUnits="userSpaceOnUse"><stop offset="0" class="tv-fb-0"/><stop offset=".35" class="tv-fb-1"/><stop offset="1" class="tv-fb-2"/></linearGradient></defs><path class="tv-fb-plume" fill="url(#tv-fb)"/></svg><canvas class="iso-layer tv-plume" aria-hidden="true"></canvas>${out.layerSvg("engine", { width: W, height: H })}${midSvg}${actSvg}${frontSvg}</div>`;
 
+// Carrera de los actuadores en el cono de ±6°, de la geometría real (misma rotación que el motor 3D)
+const rotate = (axis, deg, v) => {
+  const [x, y, z] = G.unit3(axis);
+  const c = Math.cos(deg * DEG);
+  const sn = Math.sin(deg * DEG);
+  const C = 1 - c;
+  const M = [c + x * x * C, x * y * C - z * sn, x * z * C + y * sn, y * x * C + z * sn, c + y * y * C, y * z * C - x * sn, z * x * C - y * sn, z * y * C + x * sn, c + z * z * C];
+  return [M[0] * v[0] + M[1] * v[1] + M[2] * v[2], M[3] * v[0] + M[4] * v[1] + M[5] * v[2], M[6] * v[0] + M[7] * v[1] + M[8] * v[2]];
+};
+const STROKE = {};
+for (const id of ["A", "B"]) {
+  const rest = G.len3(G.sub3(L0[id], U[id]));
+  let lo = 0;
+  let hi = 0;
+  for (let i = 0; i < 72; i++) {
+    const a = (i / 72) * Math.PI * 2;
+    const L = G.add3(GC, rotate(A1, MODEL.limit * Math.cos(a), rotate(A2, MODEL.limit * Math.sin(a), G.sub3(L0[id], GC))));
+    const d = (G.len3(G.sub3(L, U[id])) - rest) * 10;
+    lo = Math.min(lo, d);
+    hi = Math.max(hi, d);
+  }
+  STROKE[id] = [lo, hi];
+}
+const EPS = (EXIT_R / 12) ** 2;
+// Conjuntos: nombre, prefijos de las piezas que lo forman y una ficha con lo que hace
+const mm = (v) => Math.round(Math.abs(v));
+export const ASSEMBLIES = [
+  { id: "gimbal", name: "Cardán", match: ["gimbal.", "stand.gimbal-block"], text: `Dos ejes a 90°. La cruceta gira sobre las dos orejas fijas y el motor gira sobre la cruceta, así que el motor puede inclinarse en cualquier dirección hasta ${MODEL.limit}°. Por sus cuatro muñones pasan los ${MODEL.thrustKN} kN de empuje hacia la placa.` },
+  { id: "actuators", name: "Actuadores", match: ["engine.lug.", "engine.lugball", "stand.bracket", "stand.harness"], act: true, text: `Dos actuadores electromecánicos, a 90° entre sí. Un motor eléctrico mueve, por una reductora, un husillo de bolas que alarga o acorta el vástago. Para recorrer el cono de ±${MODEL.limit}° el A va de −${mm(STROKE.A[0])} a +${mm(STROKE.A[1])} mm y el B de −${mm(STROKE.B[0])} a +${mm(STROKE.B[1])} mm, a ${MODEL.rate}°/s como máximo.` },
+  { id: "chamber", name: "Cámara e inyector", match: ["engine.post", "engine.dome", "engine.injector", "engine.chamber", "engine.lugring", "engine.converge", "engine.throat", "sensor.pc"], text: `El oxígeno entra por la cúpula y el queroseno por la placa de inyección, que los mezcla en miles de chorros. Arden en una cámara de ${(44).toFixed(0)} cm de diámetro; en la garganta, de 24 cm, el gas pasa de subsónico a supersónico. Los transductores leen la presión de cámara.` },
+  { id: "nozzle", name: "Tobera", match: ["engine.bell", "engine.lip", "fuel.ring", "fuel.tee"], text: `La campana expande el gas desde la garganta hasta una salida de ${(2 * EXIT_R).toFixed(0)} cm: relación de áreas ε ≈ ${EPS.toFixed(0)}. Es regenerativa: el queroseno entra por el colector que la rodea y sube por canales en su pared para enfriarla antes de quemarse. En el despiece baja ${EXPLODE.travel.nozzle} cm.` },
+  { id: "tp", name: "Turbobomba", match: ["tp.", "pipe.lox", "fuel.duct", "fuel.inlet", "sensor.tp"], text: "Un solo eje vertical: bomba de oxígeno arriba, turbina en medio y bomba de queroseno abajo. Sube la presión de los dos propelentes para meterlos en la cámara: el oxígeno sale recto hacia el inyector y el queroseno baja al colector de la tobera." },
+  { id: "gg", name: "Generador de gas", match: ["gg."], text: "Una pequeña cámara que quema una fracción de los propelentes, con exceso de queroseno para que el gas no funda los álabes. Ese gas caliente es el que hace girar la turbina." },
+  { id: "exh", name: "Escape de la turbina", match: ["exh."], text: "Ciclo abierto: el gas que ya movió la turbina no entra en la cámara, se tira por esta tobera aparte. Es el precio de la sencillez del generador de gas: un poco de propelente que no da empuje útil." },
+  { id: "feeds", name: "Líneas de alimentación", match: ["stand.feed"], bellows: true, text: "Bajan el oxígeno y el queroseno desde los tanques. Sus fuelles articulados se doblan para seguir al motor cuando se inclina, sin transmitirle esfuerzos; al despiezar se quedan colgando de su brida." },
+  { id: "stand", name: "Banco y placa de empuje", match: ["stand.plate", "stand.loadcell", "stand.beam", "stand.strut", "stand.column", "stand.ladder"], text: `La placa de empuje cuelga de dos células de carga que miden los ${MODEL.thrustKN} kN; el cono de cuatro puntales con rótulas lleva esa carga hasta el bloque del cardán. Debajo, el foso con su aro de agua recibe el chorro.` },
+];
+const sel = (a) => [...a.match.map((prefix) => `[data-name^="${prefix}"]`), ...(a.act ? ["[data-act]"] : []), ...(a.bellows ? ["[data-bellows]"] : [])].join(",");
+const FOCUS_CSS = [
+  `.tv-stage[data-focus] :is([data-name],[data-act],[data-bellows]){--anatomy-hi:var(--anatomy-mid);--anatomy-mid:var(--anatomy-lo);--anatomy-lit:var(--anatomy-mid);--anatomy-lit-top:var(--anatomy-top);--anatomy-lit-shade:var(--anatomy-shade-1)}`,
+  ...ASSEMBLIES.map((a) => `.tv-stage[data-focus="${a.id}"] :is(${sel(a)}){--anatomy-lit:inherit;--anatomy-lit-top:inherit;--anatomy-lit-shade:inherit;--anatomy-hi:var(--anatomy-lit);--anatomy-mid:var(--anatomy-hi);--tn-0:var(--anatomy-lit-shade);--tn-1:var(--anatomy-lit-shade);--tn-2:var(--anatomy-lit-shade);--tn-3:var(--anatomy-lit-shade);--tn-4:var(--anatomy-lit-top)}\n.tv-stage[data-focus="${a.id}"] :is(${sel(a)}) :is(.iso-top,.tb-shine){fill:var(--anatomy-lit-top)}\n.tv-stage[data-focus="${a.id}"] :is(${sel(a)}) :is(.iso-shade,.tb-body){fill:var(--anatomy-lit-shade)}`),
+].join("\n");
+
 const DATA = {
   W, H, P, model: MODEL, turn: out.data,
+  explode: EXPLODE, assemblies: ASSEMBLIES.map(({ id, name, text }) => ({ id, name, text })),
   U, L0, SIDE, A1, A2, GC, FEEDS, exitS: BELL_S[1], exitR: EXIT_R, pit: [PIT.x, PIT.y, PIT.x + PIT.w, PIT.y + PIT.d], pitD: PIT_D, deck: [DECK.x, DECK.y, DECK.x + DECK.w, DECK.y + DECK.d],
   camera: glCamera(P),
 };
@@ -546,7 +620,8 @@ const latheSource = readFileSync(join(HERE, "anatomy/kit/lathe.mjs"), "utf8").re
 const latheNames = [...latheSource.matchAll(/^export (?:function|const) (\w+)/gm)].map((m) => m[1]);
 const G_SCRIPT = `const G = (() => {\n${latheSource.replace(/^export /gm, "")}\nreturn { ${latheNames.join(", ")} };\n})();\n`;
 const ACT_SCRIPT = readFileSync(join(HERE, "actuators.mjs"), "utf8").replace(/^export /gm, "");
-const CSS = out.css + "\n" + readFileSync(join(HERE, "tvc.css"), "utf8");
+const EXPLODE_SCRIPT = readFileSync(join(HERE, "explode.mjs"), "utf8").replace(/^export /gm, "");
+const CSS = out.css + "\n" + readFileSync(join(HERE, "tvc.css"), "utf8") + "\n" + FOCUS_CSS;
 const LIVE = readFileSync(join(HERE, "live.js"), "utf8").replace("__DATA__", JSON.stringify(DATA));
 const corners = `<div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 1</span><span class="iso-plate-corner" data-corner="title">Empuje vectorial · banco TVC-1</span><span class="iso-plate-corner" data-corner="hint">Mueve el puntero para apuntar la tobera</span><span class="iso-plate-corner" data-corner="readout" data-readout>δ 0.0° · frío</span></div>`;
 const caption = `Un cohete no tiene timón: se gobierna inclinando su motor. Este motor de ${MODEL.thrustKN} kN cuelga de un cardán de dos ejes, y dos actuadores electromecánicos, a 90° entre sí, lo empujan por debajo del cardán; la carrera que marca la lectura sale de la distancia real entre sus dos rótulas. Inclinar el empuje F un ángulo δ crea una fuerza lateral F·sen δ: a 6°, unos ${(MODEL.thrustKN * Math.sin(6 * DEG)).toFixed(0)} kN. Aplicada ${MODEL.leverM} m por debajo del centro de masa, eso es un par de ${((MODEL.thrustKN * Math.sin(6 * DEG) * MODEL.leverM) / 1000).toFixed(2)} MN·m que hace girar al vehículo. Los fuelles de las líneas de oxígeno y queroseno se doblan para seguir al motor. La I enciende y apaga.`;
@@ -560,9 +635,11 @@ const legend = k.plateHtml({
   caption,
   body: "",
 }).replace(/^[\s\S]*?(<figcaption)/, "$1").replace(/<\/figure>$/, "");
-const controls = `<div class="tv-controls"><button type="button" class="tv-fire" data-fire><span class="tv-lamp" aria-hidden="true"></span><span data-fire-label>Encender</span></button><span class="tv-live" aria-live="polite" data-say></span></div>`;
-const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div>${legend}</figure>`;
-const page = k.pageHtml({ title: "Empuje vectorial", theme: THEME, body, script: kitScript() + G_SCRIPT + ACT_SCRIPT + turnScript() + glScript() + (verify ? `window.__isoVerify = ${JSON.stringify(out.verify)};\n` : "") + LIVE, width: 940 });
+const controls = `<div class="tv-controls"><button type="button" class="tv-fire" data-fire><span class="tv-lamp" aria-hidden="true"></span><span data-fire-label>Encender</span></button><button type="button" class="tv-fire" data-apart><span class="tv-lamp" aria-hidden="true"></span><span data-apart-label>Despiezar</span></button><span class="tv-live" aria-live="polite" data-say></span></div>`;
+const PARTS = ASSEMBLIES.map((a, i) => `<button type="button" class="tv-part" data-part="${a.id}"><span class="tv-num">${String(i + 1).padStart(2, "0")}</span>${a.name}</button>`).join("");
+const INFO = `<div class="tv-info" data-info aria-live="polite"><span class="tv-info-title" data-info-title>Anatomía</span><span class="tv-info-text" data-info-text>Pasa por un conjunto de la lista, o pulsa su número, para despiezar el motor y resaltarlo. D despieza o monta; Esc vuelve.</span></div>`;
+const body = `<figure class="iso-figure tv"><div class="iso-plate">${corners}<style>${CSS}</style>${stage}${controls}</div><div class="tv-anatomy"><div class="tv-parts" role="group" aria-label="Conjuntos del motor">${PARTS}</div>${INFO}</div>${legend}</figure>`;
+const page = k.pageHtml({ title: "Empuje vectorial", theme: THEME, body, script: kitScript() + G_SCRIPT + ACT_SCRIPT + EXPLODE_SCRIPT + turnScript() + glScript() + (verify ? `window.__isoVerify = ${JSON.stringify(out.verify)};\n` : "") + LIVE, width: 940 });
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const name = `motor-vectorial${verify ? "-verify" : ""}${THEME === "light" ? "-light" : ""}.html`;
   writeFileSync(join(HERE, name), page);
