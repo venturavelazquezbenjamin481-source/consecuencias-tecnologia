@@ -1,0 +1,7 @@
+.tv{--tv-void:#d9d6cf;--tv-pit:#cbc7bf}
+.iso[data-theme="dark"] .tv{--tv-void:#0b0b0b;--tv-pit:#121212}
+.tv-void{fill:var(--tv-void)}
+.tv-pit-floor{fill:var(--tv-pit)}
+.tv-stage{touch-action:none;cursor:crosshair;outline:none;border-radius:8px}
+.tv-stage:focus-visible{outline:1px solid var(--anatomy-muted);outline-offset:6px}
+.tv-plume{display:block}
