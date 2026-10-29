@@ -46,7 +46,7 @@ export const PIEZAS = [
   { n: 9, nombre: "Marco de balsa", funcion: "20 × 12 cm con barra central de 9.5 cm, unido con tornillos.", ancla: () => [100, 22, -4] },
 ];
 
-const pinesSvg = (angulo) => {
+export const pinesSvg = (angulo) => {
   const p = pose(angulo);
   return `<g class="pines">${PIEZAS.map(({ n, ancla }) => {
     const [x, y] = k.iso(ancla(p), P);
