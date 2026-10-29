@@ -2,7 +2,7 @@
 const fs = require("fs");
 const {
   Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell,
-  WidthType, ShadingType, BorderStyle, LevelFormat, Footer, PageNumber, PageBreak, ExternalHyperlink,
+  WidthType, ShadingType, BorderStyle, LevelFormat, Footer, PageNumber, PageBreak,
 } = require("docx");
 const { imageSize } = (() => {
   // Tamaño de un PNG leyendo su cabecera
@@ -15,7 +15,6 @@ const FUENTE = "Calibri";
 const TINTA = "1D1D20";
 const SUAVE = "55555A";
 const ACENTO = "2F5FE0";
-const ENLACE = "https://claude.ai/artifact/RbkppsqGifGw8Zdwvmf7sE";
 
 const p = (texto, op = {}) => new Paragraph({ spacing: { after: 140, line: 300 }, ...op, children: (Array.isArray(texto) ? texto : [texto]).map((t) => (typeof t === "string" ? new TextRun(t) : t)) });
 const b = (t) => new TextRun({ text: t, bold: true });
@@ -178,13 +177,8 @@ const doc = new Document({
         ...figura("word/posicion-3-recorte.png", "Figura 5. Posición 3, con la polea en 270°: la posición inicial."),
         p("El mecanismo vuelve a la posición inicial, con las seis patas apoyadas, y el ciclo se repite mientras el motor siga girando."),
 
-        // ---------- 6. Versión interactiva ----------
-        h1("6. Versión interactiva"),
-        p("También hicimos una versión interactiva del robot en una página web. Ahí se puede encender el motor, cambiar la velocidad de 0 a 100 rpm, ver el ángulo de la polea y la posición del ciclo en vivo, tocar cada pieza para ver su función y revisar el circuito eléctrico."),
-        new Paragraph({ spacing: { after: 140 }, children: [new TextRun({ text: "Enlace: ", bold: true }), new ExternalHyperlink({ link: ENLACE, children: [new TextRun({ text: ENLACE, style: "Hyperlink", color: ACENTO, underline: {} })] })] }),
-
-        // ---------- 7. Conclusión ----------
-        h1("7. Conclusión"),
+        // ---------- 6. Conclusión ----------
+        h1("6. Conclusión"),
         p("Con este proyecto aprendimos cómo un mecanismo puede convertir el giro de un motor en pasos, sin necesidad de programación. La polea con su orificio excéntrico, las bielas y los pivotes trabajan juntos para mover las seis patas. También vimos que la forma de conectar los motores (la polaridad) decide hacia dónde giran, y que por eso hay que invertirla cuando los motores están montados en espejo."),
       ],
     },
