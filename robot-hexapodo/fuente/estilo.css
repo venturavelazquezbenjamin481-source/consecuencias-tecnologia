@@ -1,0 +1,331 @@
+/* Estilos de la página del robot hexápodo */
+:root {
+  --fondo: #f2f2ef;
+  --tarjeta: #fbfbfa;
+  --texto: #1d1d20;
+  --texto-suave: #5b5b61;
+  --borde: #d6d6d9;
+  --resalte: #2f5fe0;
+  --resalte-claro: #e3eafe;
+  --resalte-medio: #c8d6fb;
+  --encendido: #1f8a4c;
+  --radio: 12px;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+body {
+  background: var(--fondo);
+}
+.iso-page {
+  width: min(1180px, 100% - 32px);
+  margin: 28px auto 64px;
+}
+.encabezado {
+  max-width: 46em;
+  margin-bottom: 18px;
+}
+.antetitulo {
+  margin: 0 0 4px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+.encabezado h1 {
+  margin: 0 0 6px;
+  font-size: clamp(26px, 5vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--texto);
+}
+.intro {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+
+/* Pestañas */
+.pestanas {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  background: #e6e6e2;
+  border-radius: 999px;
+}
+.pestanas button {
+  border: 0;
+  background: transparent;
+  color: var(--texto-suave);
+  font: 600 14px/1 ui-sans-serif, system-ui, sans-serif;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 40px;
+}
+.pestanas button[aria-selected="true"] {
+  background: #fff;
+  color: var(--texto);
+  box-shadow: 0 1px 2px #0000001f;
+}
+
+/* Diseño: figura y panel */
+.diseno {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 960px) {
+  .diseno {
+    grid-template-columns: minmax(0, 1fr) 330px;
+    align-items: start;
+  }
+}
+.tarjeta-figura {
+  margin: 0;
+}
+.tarjeta-figura .iso-plate {
+  padding: 44px 14px 40px;
+  border-radius: var(--radio);
+}
+.escenario {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.escenario .pieza,
+.escenario .cable {
+  cursor: pointer;
+}
+.vista[hidden] {
+  display: none;
+}
+@media (max-width: 560px) {
+  .tarjeta-figura .iso-plate {
+    padding: 38px 4px 36px;
+    margin: 0 -8px;
+  }
+  .iso-plate-corner[data-corner="hint"] {
+    bottom: 0;
+  }
+  .iso-plate-corners {
+    inset: 14px 14px;
+  }
+}
+
+/* Panel de control */
+.panel {
+  display: grid;
+  gap: 16px;
+}
+.tablero,
+.ficha {
+  background: var(--tarjeta);
+  border-radius: var(--radio);
+  box-shadow: 0 0 0 1px var(--borde);
+  padding: 16px;
+}
+.boton-encendido {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 10px;
+  background: #1d1d20;
+  color: #fff;
+  font: 650 16px/1 ui-sans-serif, system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.boton-encendido svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.boton-encendido[aria-pressed="true"] {
+  background: var(--encendido);
+}
+.boton-encendido:focus-visible,
+.pestanas button:focus-visible,
+.chip-posicion:focus-visible,
+.boton-pieza:focus-visible {
+  outline: 2px solid var(--resalte);
+  outline-offset: 2px;
+}
+.control-rpm {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+.control-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.control-rpm output {
+  font: 600 15px var(--mono);
+  color: var(--texto);
+}
+.control-rpm input {
+  width: 100%;
+  height: 32px;
+  accent-color: #1d1d20;
+  cursor: pointer;
+}
+.escala {
+  font: 11px var(--mono);
+  color: #8c8c90;
+}
+.lecturas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.lectura {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--borde);
+  padding: 10px 12px;
+}
+.lectura span {
+  display: block;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+.lectura strong {
+  display: block;
+  font: 650 30px/1.15 var(--mono);
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+.posiciones {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.chip-posicion {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  min-height: 52px;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 10px;
+  background: #ececea;
+  color: var(--texto);
+  cursor: pointer;
+  font: inherit;
+}
+.chip-posicion b {
+  font: 650 17px/1 ui-sans-serif, system-ui, sans-serif;
+}
+.chip-posicion span {
+  font: 11px var(--mono);
+  color: var(--texto-suave);
+}
+.chip-posicion[data-activa] {
+  background: #1d1d20;
+  color: #fff;
+}
+.chip-posicion[data-activa] span {
+  color: #d0d0d4;
+}
+.estado {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}
+.ficha-etiqueta {
+  margin: 0 0 4px;
+  font: 11px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--resalte);
+}
+.ficha h2 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--texto);
+}
+.ficha p:last-child {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+/* Lista de piezas */
+.lista-piezas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.boton-pieza {
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--borde);
+  color: var(--texto);
+  font: 500 14px/1.2 ui-sans-serif, system-ui, sans-serif;
+  cursor: pointer;
+}
+.boton-pieza[aria-pressed="true"] {
+  background: var(--resalte);
+  box-shadow: none;
+  color: #fff;
+}
+
+/* Corriente que viaja por los cables cuando está encendido */
+.flujo {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 0.75;
+  stroke-linecap: round;
+  stroke-dasharray: 1.4 4.6;
+  stroke-dashoffset: calc(var(--inicio) - var(--flujo, 0px));
+  vector-effect: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.flujo-inverso {
+  stroke-dashoffset: calc(var(--inicio) + var(--flujo, 0px));
+}
+.escenario[data-encendido] .flujo {
+  stroke: #ffffff;
+  opacity: 0.9;
+}
+@media (prefers-reduced-motion: reduce) {
+  .boton-encendido,
+  .flujo {
+    transition: none;
+  }
+}
+
+/* Fichas A y B de los motores en el circuito */
+.pin circle.fondo {
+  fill: #151517;
+  stroke: #fff;
+  stroke-width: 1.6px;
+  vector-effect: non-scaling-stroke;
+}
+.pin text {
+  fill: #fff;
+  font: 600 8.4px ui-sans-serif, system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
